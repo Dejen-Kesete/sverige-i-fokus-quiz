@@ -299,6 +299,8 @@ const SUPABASE_URL = 'https://gegbyomiijscrnzdanco.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_FuZ8waZ9hYfQt5IJvIQxbQ_P2raZLvv';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const CREATE_CHECKOUT_SESSION_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`;
+
 /* ---------------- State ---------------- */
 let currentUser = null;
 let currentProfile = null;
@@ -495,6 +497,7 @@ async function onLoggedIn(user){
 
   await loadData();
   showScreen('select');
+  handleStripeReturn();
 }
 
 async function loadData(){
@@ -532,6 +535,53 @@ async function submitAccessRequest(){
     return;
   }
   await renderChapterGrid();
+}
+
+async function startStripeCheckout(){
+  const btn = document.getElementById('stripeCheckoutBtn');
+  const msg = document.getElementById('stripeCheckoutMsg');
+  msg.classList.add('hidden');
+  btn.disabled = true;
+  btn.textContent = 'Ett ögonblick...';
+  try{
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(CREATE_CHECKOUT_SESSION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ returnUrl: window.location.origin + window.location.pathname }),
+    });
+    const data = await res.json();
+    if(!res.ok || !data.url) throw new Error(data.error || 'Kunde inte starta betalningen.');
+    window.location.href = data.url;
+  } catch(err){
+    msg.classList.remove('hidden');
+    msg.textContent = err.message || 'Något gick fel. Försök igen.';
+    btn.disabled = false;
+    btn.textContent = '💳 Betala med kort (299 kr) — direkt åtkomst';
+  }
+}
+
+async function handleStripeReturn(){
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('stripe');
+  if(!status) return;
+  history.replaceState({}, '', window.location.pathname);
+  if(status !== 'success') return;
+  const banner = document.createElement('div');
+  banner.className = 'explanation';
+  banner.style.cssText = 'margin-bottom:16px;text-align:center;';
+  banner.textContent = '✅ Betalning mottagen! Aktiverar din åtkomst...';
+  const selectScreen = document.getElementById('screen-select');
+  selectScreen.prepend(banner);
+  for(let i=0;i<6;i++){
+    await new Promise(r => setTimeout(r, 3000));
+    await loadData();
+    if(document.querySelector('#chapterGrid .chapter-card')){ banner.remove(); return; }
+  }
+  banner.textContent = 'Betalningen är mottagen men det tar lite längre tid än vanligt att aktivera åtkomsten. Ladda om sidan om en stund.';
 }
 
 /* ---------------- Chapter grid ---------------- */
@@ -592,11 +642,15 @@ async function renderChapterGrid(){
         <img src="IMG_5109.PNG" alt="Swish QR-kod" style="max-width:260px;width:100%;border-radius:8px;margin:14px 0;border:1px solid var(--card-border);">
         ${instructionsBlock}
         ${requestSection}
+        <div style="margin:18px 0 4px;color:var(--fg-soft);font-size:12px;text-transform:uppercase;letter-spacing:.08em;">eller</div>
+        <button class="btn-primary" id="stripeCheckoutBtn" style="width:100%;">💳 Betala med kort (299 kr) — direkt åtkomst</button>
+        <div class="auth-error hidden" id="stripeCheckoutMsg" style="margin-top:10px;"></div>
       </div>
     `;
     document.getElementById('startAllBtn').classList.add('hidden');
     const reqBtn = document.getElementById('requestAccessBtn');
     if(reqBtn) reqBtn.addEventListener('click', submitAccessRequest);
+    document.getElementById('stripeCheckoutBtn').addEventListener('click', startStripeCheckout);
     return;
   }
   document.getElementById('startAllBtn').classList.remove('hidden');
