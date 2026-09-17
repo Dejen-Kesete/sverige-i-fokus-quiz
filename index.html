@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sverige i fokus — Övningsquiz</title>
+<meta name="description" content="Övningsquiz för medborgarskapsprovet — 206 frågor baserat på Sverige i fokus, 13 kapitel.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sverige i fokus — Övningsquiz">
+<meta property="og:description" content="Träna inför medborgarskapsprovet med 206 frågor fördelat på 13 kapitel, baserat på UHR/Skolverkets utbildningsmaterial.">
+<meta property="og:image" content="https://sverige-i-fokus-quiz.netlify.app/quiz-thumbnail.png">
+<meta property="og:url" content="https://sverige-i-fokus-quiz.netlify.app">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sverige i fokus — Övningsquiz">
+<meta name="twitter:description" content="Träna inför medborgarskapsprovet — 206 frågor, 13 kapitel.">
+<meta name="twitter:image" content="https://sverige-i-fokus-quiz.netlify.app/quiz-thumbnail.png">
+<style>
+  :root{
+    --navy-950:#0a1628; --navy-900:#0f1f38; --navy-800:#152a4a; --navy-700:#1e3a5f;
+    --gold-500:#c9a24b; --gold-400:#dab968; --gold-300:#e8cf94; --cream:#f7f4ed;
+    --green:#3f8f5f; --red:#c0483f; --text-soft:#c7d2e3;
+    --bg-grad-1:var(--navy-950); --bg-grad-2:var(--navy-900); --bg-grad-3:var(--navy-800);
+    --card-bg:var(--navy-800); --card-border:rgba(201,162,75,0.2); --opt-bg:var(--navy-900);
+    --fg:var(--cream); --fg-soft:var(--text-soft);
+  }
+  body.light{
+    --bg-grad-1:#faf7ef; --bg-grad-2:#f3ecd9; --bg-grad-3:#ecdfc0;
+    --card-bg:#ffffff; --card-border:rgba(31,42,74,0.15); --opt-bg:#f7f4ed;
+    --fg:#1b2438; --fg-soft:#4b5a72; --navy-800:#ffffff; --navy-900:#f7f4ed; --navy-700:#efe6cd;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Georgia','Charter',serif;background:linear-gradient(180deg,var(--bg-grad-1),var(--bg-grad-2) 60%,var(--bg-grad-3));color:var(--fg);min-height:100vh;transition:background .25s,color .25s;}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 20px 60px;}
+  header.top{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--card-border);margin-bottom:22px;position:relative;}
+  header.top .kicker{letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:var(--gold-400);font-family:'Helvetica Neue',Arial,sans-serif;margin-bottom:8px;}
+  header.top h1{font-size:28px;margin:0 0 6px;font-weight:700;}
+  header.top p{color:var(--fg-soft);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13.5px;margin:0;}
+  .gold-rule{width:56px;height:2px;background:var(--gold-500);margin:12px auto 0;}
+  .theme-toggle{position:absolute;top:0;right:0;background:none;border:1px solid var(--card-border);color:var(--fg-soft);border-radius:20px;padding:6px 12px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;}
+  .theme-toggle:hover{border-color:var(--gold-500);color:var(--gold-400);}
+  .userbar{position:absolute;top:0;left:0;font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:var(--fg-soft);}
+  .userbar button{background:none;border:none;color:var(--gold-400);cursor:pointer;font-family:inherit;font-size:12px;margin-left:8px;text-decoration:underline;padding:0;}
+
+  .auth-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:28px 24px;font-family:'Helvetica Neue',Arial,sans-serif;max-width:400px;margin:20px auto;}
+  .auth-card h2{font-family:Georgia,serif;margin:0 0 16px;font-size:20px;}
+  .auth-card input{width:100%;padding:12px 14px;margin-bottom:10px;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:inherit;font-size:14px;}
+  .auth-card button{width:100%;background:var(--gold-500);color:var(--navy-950,#0a1628);font-weight:700;border:none;border-radius:6px;padding:13px;cursor:pointer;font-size:14px;margin-top:6px;}
+  .auth-card button:hover{background:var(--gold-400);}
+  .auth-toggle{text-align:center;margin-top:14px;font-size:13px;color:var(--fg-soft);}
+  .auth-toggle a{color:var(--gold-400);cursor:pointer;text-decoration:underline;}
+  .auth-error{color:#e88a80;font-size:13px;margin-top:6px;}
+  .auth-loading{text-align:center;color:var(--fg-soft);font-family:'Helvetica Neue',Arial,sans-serif;padding:40px 0;}
+
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-family:'Helvetica Neue',Arial,sans-serif;}
+  .toggle-chip{background:var(--opt-bg);border:1px solid var(--card-border);border-radius:20px;padding:7px 13px;font-size:12.5px;color:var(--fg-soft);cursor:pointer;user-select:none;}
+  .toggle-chip.active{border-color:var(--gold-500);color:var(--gold-400);background:rgba(201,162,75,0.1);}
+
+  .chapter-grid{display:flex;flex-direction:column;gap:10px;}
+  .chapter-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;transition:border-color .15s,transform .1s;font-family:'Helvetica Neue',Arial,sans-serif;}
+  .chapter-card:hover{border-color:var(--gold-500);transform:translateY(-1px);}
+  .chapter-card .num{font-family:Georgia,serif;font-size:22px;color:var(--gold-400);min-width:34px;}
+  .chapter-card .info{flex:1;}
+  .chapter-card .info h3{margin:0 0 3px;font-size:16px;font-family:Georgia,serif;}
+  .chapter-card .info span{font-size:12.5px;color:var(--fg-soft);}
+  .chapter-card .badge{font-size:11px;background:rgba(201,162,75,0.14);color:var(--gold-400);border:1px solid rgba(201,162,75,0.3);border-radius:20px;padding:4px 10px;white-space:nowrap;}
+  .chapter-card .badge.done{background:rgba(63,143,95,0.18);color:#3f8f5f;border-color:rgba(63,143,95,0.4);}
+
+  .allbtn{margin-top:18px;width:100%;text-align:center;background:var(--gold-500);color:var(--navy-950,#0a1628);font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:14px;border:none;border-radius:6px;padding:14px;cursor:pointer;}
+  .allbtn:hover{background:var(--gold-400);}
+  .adminbtn{margin-top:10px;width:100%;text-align:center;background:none;color:var(--gold-400);font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:13px;border:1px dashed var(--gold-500);border-radius:6px;padding:12px;cursor:pointer;}
+
+  .quiz-header{display:flex;justify-content:space-between;align-items:center;font-family:'Helvetica Neue',Arial,sans-serif;margin-bottom:14px;}
+  .quiz-header .back{color:var(--gold-400);cursor:pointer;font-size:13px;background:none;border:none;font-family:inherit;padding:0;}
+  .quiz-header .progress-label{color:var(--fg-soft);font-size:13px;}
+  .progress-bar{height:4px;background:var(--opt-bg);border-radius:4px;overflow:hidden;margin-bottom:24px;}
+  .progress-fill{height:100%;background:var(--gold-500);transition:width .25s;}
+
+  .question-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:26px 24px;}
+  .q-chapter-tag{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-400);margin-bottom:10px;}
+  .q-text{font-size:19px;line-height:1.5;margin:0 0 20px;}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .option{text-align:left;background:var(--opt-bg);border:1px solid var(--card-border);border-radius:6px;padding:13px 16px;color:var(--fg);font-family:'Helvetica Neue',Arial,sans-serif;font-size:14.5px;cursor:pointer;transition:border-color .15s;}
+  .option:hover:not(.locked){border-color:var(--gold-500);}
+  .option.correct{background:rgba(63,143,95,0.18);border-color:var(--green);}
+  .option.wrong{background:rgba(192,72,63,0.18);border-color:var(--red);}
+  .option.locked{cursor:default;opacity:.8;}
+  .option.locked:not(.correct):not(.wrong){opacity:.45;}
+
+  .explanation{margin-top:18px;background:var(--opt-bg);border-left:3px solid var(--gold-500);padding:14px 16px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13.5px;line-height:1.6;color:var(--fg-soft);border-radius:0 6px 6px 0;}
+  .explanation b{color:var(--gold-400);}
+
+  .nextbtn{margin-top:20px;width:100%;background:var(--gold-500);color:var(--navy-950,#0a1628);font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:14px;border:none;border-radius:6px;padding:13px;cursor:pointer;display:none;}
+  .nextbtn.show{display:block;}
+  .nextbtn:hover{background:var(--gold-400);}
+
+  .results{background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:36px 28px;text-align:center;}
+  .results .score{font-size:52px;color:var(--gold-400);font-weight:700;margin:8px 0 4px;}
+  .results .score-label{font-family:'Helvetica Neue',Arial,sans-serif;color:var(--fg-soft);font-size:14px;margin-bottom:22px;}
+  .results .msg{font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;margin-bottom:20px;}
+  .results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .btn-secondary,.btn-primary{font-family:'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:13.5px;border-radius:6px;padding:12px 20px;cursor:pointer;border:none;}
+  .btn-primary{background:var(--gold-500);color:var(--navy-950,#0a1628);}
+  .btn-primary:hover{background:var(--gold-400);}
+  .btn-secondary{background:transparent;border:1px solid var(--card-border);color:var(--gold-400);}
+  .btn-secondary:hover{border-color:var(--gold-500);}
+
+  .diploma-badge{margin:18px auto 0;padding:14px;border:1px dashed var(--gold-500);border-radius:8px;color:var(--gold-400);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;}
+
+  .missed-list{text-align:left;margin-top:26px;font-family:'Helvetica Neue',Arial,sans-serif;}
+  .missed-list h4{color:var(--gold-400);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .missed-item{background:var(--opt-bg);border-radius:6px;padding:12px 14px;margin-bottom:8px;font-size:13px;color:var(--fg-soft);}
+  .missed-item b{color:var(--fg);display:block;margin-bottom:4px;font-size:13.5px;}
+  .missed-item .correct-answer{color:#3f8f5f;}
+
+  .lb-list{text-align:left;margin-top:22px;font-family:'Helvetica Neue',Arial,sans-serif;}
+  .lb-list h4{color:var(--gold-400);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+  .lb-row{display:flex;justify-content:space-between;font-size:13px;padding:8px 12px;background:var(--opt-bg);border-radius:6px;margin-bottom:6px;color:var(--fg-soft);}
+  .lb-row b{color:var(--fg);}
+  .lb-row .rank{color:var(--gold-400);min-width:24px;}
+
+  .admin-row{display:flex;justify-content:space-between;font-size:13px;padding:10px 12px;background:var(--opt-bg);border-radius:6px;margin-bottom:6px;color:var(--fg-soft);font-family:'Helvetica Neue',Arial,sans-serif;text-align:left;}
+  .admin-row b{color:var(--fg);display:block;margin-bottom:3px;}
+  .admin-row .pct{color:#e88a80;font-weight:700;white-space:nowrap;margin-left:10px;}
+
+  .hidden{display:none !important;}
+  footer{text-align:center;margin-top:36px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:var(--fg-soft);opacity:.6;}
+  #diplomaCanvas{display:none;}
+  @media (max-width:480px){.q-text{font-size:17px;} .results .score{font-size:42px;} .userbar{position:static;display:block;margin-bottom:10px;text-align:center;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="userbar hidden" id="userBar"></div>
+    <button class="theme-toggle" id="themeToggle">🌙 Mörkt läge</button>
+    <div class="kicker">Medborgarskapsprov · Övning</div>
+    <h1>Sverige i fokus</h1>
+    <p>Träna kapitel för kapitel inför medborgarskapsprovet</p>
+    <div class="gold-rule"></div>
+  </header>
+
+  <div id="screen-auth">
+    <div class="auth-card">
+      <h2 id="authTitle">Logga in</h2>
+      <input type="text" id="displayNameInput" placeholder="Namn (visas i topplistan)" class="hidden">
+      <input type="email" id="emailInput" placeholder="E-post" autocomplete="email">
+      <input type="password" id="passwordInput" placeholder="Lösenord" autocomplete="current-password">
+      <button id="authSubmitBtn">Logga in</button>
+      <div class="auth-error hidden" id="authError"></div>
+      <div class="auth-toggle" id="authToggle">Inget konto? <a id="authToggleLink">Skapa ett här</a></div>
+      <div class="auth-toggle" id="forgotPasswordRow" style="margin-top:6px;"><a id="forgotPasswordLink">Glömt lösenord?</a></div>
+    </div>
+
+    <div class="auth-card hidden" id="resetRequestCard">
+      <h2>Återställ lösenord</h2>
+      <input type="email" id="resetEmailInput" placeholder="Din e-post">
+      <button id="sendResetBtn">Skicka återställningslänk</button>
+      <div class="auth-error hidden" id="resetRequestMsg"></div>
+      <div class="auth-toggle"><a id="backToLoginLink">← Tillbaka till inloggning</a></div>
+    </div>
+  </div>
+
+  <div id="screen-reset-password" class="hidden">
+    <div class="auth-card">
+      <h2>Välj ett nytt lösenord</h2>
+      <input type="password" id="newPasswordInput" placeholder="Nytt lösenord">
+      <button id="saveNewPasswordBtn">Spara nytt lösenord</button>
+      <div class="auth-error hidden" id="newPasswordMsg"></div>
+    </div>
+  </div>
+
+  <div id="screen-loading" class="hidden"><div class="auth-loading">Laddar...</div></div>
+
+  <div id="screen-select" class="hidden">
+    <div class="toolbar">
+      <div class="toggle-chip active" id="chipShuffleQ">🔀 Slumpa frågor</div>
+      <div class="toggle-chip active" id="chipShuffleO">🔀 Slumpa svar</div>
+    </div>
+    <div class="chapter-grid" id="chapterGrid"></div>
+    <button class="allbtn" id="quickReviewBtn" style="background:linear-gradient(135deg, var(--gold-500), var(--gold-400));margin-top:14px;">⚡ Snabbläst — 65 viktigaste frågorna (för dig med bråttom)</button>
+    <button class="allbtn" id="startAllBtn">Kör alla kapitel i följd</button>
+    <button class="adminbtn hidden" id="adminBtn">⚙️ Adminpanel</button>
+  </div>
+
+  <div id="screen-book" class="hidden">
+    <div class="quiz-header">
+      <button class="back" id="bookBackBtn">← Tillbaka till kapitel</button>
+    </div>
+    <div class="q-chapter-tag" id="bookChapterTag" style="margin-bottom:14px;"></div>
+    <div class="toolbar">
+      <div class="toggle-chip active" id="bookTabTigrinja">Tigrinja</div>
+      <div class="toggle-chip" id="bookTabSvenska">Lätt svenska</div>
+      <div class="toggle-chip" id="bookTabOrd">Viktiga ord</div>
+    </div>
+    <div id="bookViewerArea" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px;min-height:70vh;">
+      <p id="bookLoadingMsg" style="font-family:'Helvetica Neue',Arial,sans-serif;color:var(--fg-soft);text-align:center;padding:40px 0;">Laddar...</p>
+      <iframe id="bookIframe" class="hidden" style="width:100%;height:75vh;border:none;border-radius:6px;"></iframe>
+    </div>
+  </div>
+
+  <div id="screen-admin" class="hidden">
+    <div class="quiz-header">
+      <button class="back" id="adminBackBtn">← Tillbaka</button>
+    </div>
+    <div class="toolbar">
+      <div class="toggle-chip active" id="tabStudents">👥 Elever</div>
+      <div class="toggle-chip" id="tabRequests">📥 Förfrågningar</div>
+      <div class="toggle-chip" id="tabQuestions">📝 Frågor</div>
+      <div class="toggle-chip" id="tabStats">📊 Statistik</div>
+    </div>
+
+    <!-- FÖRFRÅGNINGAR TAB -->
+    <div id="adminTabRequests" class="hidden">
+      <h4 style="font-family:'Helvetica Neue',Arial,sans-serif;color:var(--gold-400);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Väntande förfrågningar</h4>
+      <div id="requestsList"></div>
+    </div>
+
+    <!-- ELEVER TAB -->
+    <div id="adminTabStudents">
+      <div class="question-card" style="margin-bottom:16px;">
+        <div class="q-chapter-tag">Ge åtkomst</div>
+        <input type="email" id="grantEmailInput" placeholder="Elevens e-post" style="width:100%;padding:11px 13px;margin-bottom:12px;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:sans-serif;font-size:14px;">
+        <div id="chapterCheckboxes" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13.5px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-primary" id="grantSelectedBtn" style="flex:1;">Ge valda kapitel</button>
+          <button class="btn-secondary" id="grantAllBtn" style="flex:1;">🌟 Ge full åtkomst (alla)</button>
+        </div>
+        <div class="auth-error hidden" id="grantMsg" style="margin-top:10px;"></div>
+      </div>
+      <h4 style="font-family:'Helvetica Neue',Arial,sans-serif;color:var(--gold-400);font-size:13px;text-transform:uppercase;letter-spacing:.08em;">Elever och deras åtkomst</h4>
+      <div id="studentsList"></div>
+    </div>
+
+    <!-- FRÅGOR TAB -->
+    <div id="adminTabQuestions" class="hidden">
+      <select id="questionChapterSelect" style="width:100%;padding:11px 13px;margin-bottom:14px;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:sans-serif;font-size:14px;"></select>
+      <button class="btn-primary" id="newQuestionBtn" style="width:100%;margin-bottom:16px;">+ Lägg till ny fråga</button>
+      <div id="questionEditForm" class="question-card hidden" style="margin-bottom:16px;">
+        <div class="q-chapter-tag" id="editFormTitle">Ny fråga</div>
+        <textarea id="qFormText" placeholder="Frågetext" style="width:100%;min-height:60px;padding:10px;margin-bottom:10px;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:sans-serif;font-size:14px;"></textarea>
+        <div id="qFormOptions"></div>
+        <textarea id="qFormExplanation" placeholder="Förklaring" style="width:100%;min-height:60px;padding:10px;margin:10px 0;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:sans-serif;font-size:14px;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-primary" id="saveQuestionBtn" style="flex:1;">Spara</button>
+          <button class="btn-secondary" id="cancelQuestionBtn" style="flex:1;">Avbryt</button>
+        </div>
+        <div class="auth-error hidden" id="questionFormMsg" style="margin-top:10px;"></div>
+      </div>
+      <div id="questionsAdminList"></div>
+    </div>
+
+    <!-- STATISTIK TAB -->
+    <div id="adminTabStats" class="hidden">
+      <h3 style="font-family:'Helvetica Neue',Arial,sans-serif;color:var(--gold-400);font-size:14px;">Frågor flest svarar fel på</h3>
+      <div id="adminStatsList"></div>
+    </div>
+  </div>
+
+  <div id="screen-quiz" class="hidden">
+    <div class="quiz-header">
+      <button class="back" id="backBtn">← Tillbaka till kapitel</button>
+      <span class="progress-label" id="progressLabel"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="question-card">
+      <div class="q-chapter-tag" id="qChapterTag"></div>
+      <p class="q-text" id="qText"></p>
+      <div class="options" id="optionsWrap"></div>
+      <div class="explanation hidden" id="explanationBox"></div>
+      <button class="nextbtn" id="nextBtn">Nästa fråga →</button>
+    </div>
+  </div>
+
+  <div id="screen-results" class="hidden">
+    <div class="results">
+      <div class="score-label" id="resultsChapterName">RESULTAT</div>
+      <div class="score" id="scoreText">0/0</div>
+      <div class="score-label" id="scorePercent"></div>
+      <p class="msg" id="resultsMsg"></p>
+      <div id="diplomaArea"></div>
+      <div class="results-btns">
+        <button class="btn-primary" id="retryBtn">Gör om quizet</button>
+        <button class="btn-secondary" id="toChaptersBtn">Välj annat kapitel</button>
+      </div>
+      <div class="missed-list hidden" id="missedList"></div>
+      <div class="lb-list hidden" id="leaderboardList"></div>
+    </div>
+  </div>
+
+  <footer>Baserat på Sverige i fokus — Universitets- och högskolerådet / Skolverket, 2026</footer>
+</div>
+<canvas id="diplomaCanvas" width="1000" height="700"></canvas>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://gegbyomiijscrnzdanco.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FuZ8waZ9hYfQt5IJvIQxbQ_P2raZLvv';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------- State ---------------- */
+let currentUser = null;
+let currentProfile = null;
+let chapters = [];       // [{id, title, order_index}]
+let allQuestions = [];   // [{id, chapter_id, question_text, options, correct_index, explanation}]
+let baseQuestions = [];
+let currentQuestions = [];
+let currentIdx = 0;
+let score = 0;
+let answered = false;
+let missed = [];
+let currentChapterLabel = "";
+let currentChapterId = null; // null = "all chapters"
+let shuffleQ = true;
+let shuffleO = true;
+let isSignupMode = false;
+
+/* ---------------- Elements ---------------- */
+const screens = {
+  auth: document.getElementById('screen-auth'),
+  loading: document.getElementById('screen-loading'),
+  select: document.getElementById('screen-select'),
+  admin: document.getElementById('screen-admin'),
+  quiz: document.getElementById('screen-quiz'),
+  results: document.getElementById('screen-results'),
+  book: document.getElementById('screen-book'),
+  resetPassword: document.getElementById('screen-reset-password'),
+};
+function showScreen(name){
+  Object.values(screens).forEach(s => s.classList.add('hidden'));
+  screens[name].classList.remove('hidden');
+}
+
+/* ---------------- Theme ---------------- */
+const themeToggle = document.getElementById('themeToggle');
+function applyTheme(mode){
+  document.body.classList.toggle('light', mode === 'light');
+  themeToggle.textContent = mode === 'light' ? '🌙 Mörkt läge' : '☀️ Ljust läge';
+  localStorage.setItem('sif_theme', mode);
+}
+applyTheme(localStorage.getItem('sif_theme') || 'dark');
+themeToggle.addEventListener('click', () => {
+  applyTheme(document.body.classList.contains('light') ? 'dark' : 'light');
+});
+
+/* ---------------- Auth ---------------- */
+const authTitle = document.getElementById('authTitle');
+const displayNameInput = document.getElementById('displayNameInput');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authError = document.getElementById('authError');
+const authToggle = document.getElementById('authToggle');
+const authToggleLink = document.getElementById('authToggleLink');
+
+function setAuthMode(signup){
+  isSignupMode = signup;
+  authTitle.textContent = signup ? 'Skapa konto' : 'Logga in';
+  authSubmitBtn.textContent = signup ? 'Skapa konto' : 'Logga in';
+  displayNameInput.classList.toggle('hidden', !signup);
+  authToggle.innerHTML = signup
+    ? 'Har du redan ett konto? <a id="authToggleLink">Logga in här</a>'
+    : 'Inget konto? <a id="authToggleLink">Skapa ett här</a>';
+  document.getElementById('authToggleLink').addEventListener('click', () => setAuthMode(!isSignupMode));
+  authError.classList.add('hidden');
+}
+authToggleLink.addEventListener('click', () => setAuthMode(!isSignupMode));
+
+authSubmitBtn.addEventListener('click', async () => {
+  authError.classList.add('hidden');
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if(!email || !password){
+    authError.textContent = 'Fyll i e-post och lösenord.';
+    authError.classList.remove('hidden');
+    return;
+  }
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = 'Ett ögonblick...';
+  try{
+    if(isSignupMode){
+      const displayName = displayNameInput.value.trim() || email;
+      const { error } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { display_name: displayName } }
+      });
+      if(error) throw error;
+      authError.textContent = 'Konto skapat! Om e-postbekräftelse krävs, kolla din inkorg. Annars är du redan inloggad.';
+      authError.style.color = '#8fd9ab';
+      authError.classList.remove('hidden');
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+    }
+  } catch(err){
+    authError.style.color = '#e88a80';
+    authError.textContent = err.message || 'Något gick fel.';
+    authError.classList.remove('hidden');
+  } finally {
+    authSubmitBtn.disabled = false;
+    authSubmitBtn.textContent = isSignupMode ? 'Skapa konto' : 'Logga in';
+  }
+});
+setAuthMode(false);
+
+/* ---------------- Forgot password ---------------- */
+const authCard = document.querySelector('#screen-auth .auth-card');
+const resetRequestCard = document.getElementById('resetRequestCard');
+
+document.getElementById('forgotPasswordLink').addEventListener('click', () => {
+  authCard.classList.add('hidden');
+  resetRequestCard.classList.remove('hidden');
+});
+document.getElementById('backToLoginLink').addEventListener('click', () => {
+  resetRequestCard.classList.add('hidden');
+  authCard.classList.remove('hidden');
+});
+
+document.getElementById('sendResetBtn').addEventListener('click', async () => {
+  const email = document.getElementById('resetEmailInput').value.trim();
+  const msg = document.getElementById('resetRequestMsg');
+  msg.classList.remove('hidden');
+  if(!email){
+    msg.style.color = '#e88a80';
+    msg.textContent = 'Fyll i din e-post.';
+    return;
+  }
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if(error){
+    msg.style.color = '#e88a80';
+    msg.textContent = error.message;
+    return;
+  }
+  msg.style.color = '#8fd9ab';
+  msg.textContent = '✅ Vi har skickat en återställningslänk till din e-post. Klicka på länken i mejlet för att välja ett nytt lösenord.';
+});
+
+document.getElementById('saveNewPasswordBtn').addEventListener('click', async () => {
+  const newPassword = document.getElementById('newPasswordInput').value;
+  const msg = document.getElementById('newPasswordMsg');
+  msg.classList.remove('hidden');
+  if(!newPassword || newPassword.length < 6){
+    msg.style.color = '#e88a80';
+    msg.textContent = 'Lösenordet måste vara minst 6 tecken.';
+    return;
+  }
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if(error){
+    msg.style.color = '#e88a80';
+    msg.textContent = error.message;
+    return;
+  }
+  msg.style.color = '#8fd9ab';
+  msg.textContent = '✅ Lösenordet är uppdaterat! Du loggas in automatiskt...';
+  setTimeout(() => { window.location.href = window.location.origin + window.location.pathname; }, 1500);
+});
+
+async function handleLogout(){
+  await supabase.auth.signOut();
+  currentUser = null; currentProfile = null;
+  showScreen('auth');
+  document.getElementById('userBar').classList.add('hidden');
+}
+
+/* ---------------- Init / session ---------------- */
+supabase.auth.onAuthStateChange((event, session) => {
+  if(event === 'PASSWORD_RECOVERY'){
+    showScreen('resetPassword');
+    return;
+  }
+  if(session && session.user){
+    onLoggedIn(session.user);
+  } else if(event === 'SIGNED_OUT'){
+    currentUser = null;
+    showScreen('auth');
+  }
+});
+
+async function onLoggedIn(user){
+  currentUser = user;
+  showScreen('loading');
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  currentProfile = profile;
+  const userBar = document.getElementById('userBar');
+  userBar.classList.remove('hidden');
+  userBar.innerHTML = `${profile ? profile.display_name : user.email}<button id="logoutBtn">Logga ut</button>`;
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+  const adminBtn = document.getElementById('adminBtn');
+  if(profile && profile.role === 'admin') adminBtn.classList.remove('hidden');
+  else adminBtn.classList.add('hidden');
+
+  await loadData();
+  showScreen('select');
+}
+
+async function loadData(){
+  const { data: chData } = await supabase.from('chapters').select('*').order('order_index');
+  chapters = chData || [];
+  const { data: qData } = await supabase.from('questions').select('*');
+  allQuestions = qData || [];
+  await renderChapterGrid();
+}
+
+async function getMyRequestStatus(){
+  if(!currentUser) return null;
+  const { data } = await supabase
+    .from('access_requests')
+    .select('status')
+    .eq('user_id', currentUser.id)
+    .order('requested_at', { ascending: false })
+    .limit(1);
+  if(!data || data.length === 0) return null;
+  return data[0].status;
+}
+
+async function submitAccessRequest(){
+  const btn = document.getElementById('requestAccessBtn');
+  const msg = document.getElementById('requestAccessMsg');
+  btn.disabled = true;
+  btn.textContent = 'Skickar...';
+  const { error } = await supabase.from('access_requests').insert({ user_id: currentUser.id });
+  if(error){
+    msg.classList.remove('hidden');
+    msg.style.color = '#e88a80';
+    msg.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = '✅ Jag har betalat — begär tillgång';
+    return;
+  }
+  await renderChapterGrid();
+}
+
+/* ---------------- Chapter grid ---------------- */
+async function getMyProgress(){
+  if(!currentUser) return {};
+  const { data } = await supabase
+    .from('attempts')
+    .select('chapter_id, percent')
+    .eq('user_id', currentUser.id);
+  const best = {};
+  (data || []).forEach(a => {
+    if(a.chapter_id == null) return;
+    if(!(a.chapter_id in best) || a.percent > best[a.chapter_id]) best[a.chapter_id] = a.percent;
+  });
+  return best;
+}
+
+async function renderChapterGrid(){
+  const progress = await getMyProgress();
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = '';
+  // Endast kapitel eleven faktiskt har tillgång till visas (RLS filtrerar allQuestions redan,
+  // så qCount blir 0 för låsta kapitel om man inte är admin).
+  const visibleChapters = chapters.filter((ch, i) => {
+    const qCount = allQuestions.filter(q => q.chapter_id === ch.id).length;
+    return qCount > 0;
+  });
+  if(visibleChapters.length === 0){
+    const requestStatus = await getMyRequestStatus();
+    let requestSection = '';
+    if(requestStatus === 'pending'){
+      requestSection = `<div class="explanation" style="margin-top:16px;text-align:center;">⏳ Din förfrågan väntar på godkännande. Kom tillbaka och uppdatera sidan om en stund.</div>`;
+    } else {
+      requestSection = `
+        <button class="btn-primary" id="requestAccessBtn" style="width:100%;margin-top:16px;">✅ Jag har betalat — begär tillgång</button>
+        <div class="auth-error hidden" id="requestAccessMsg" style="margin-top:10px;"></div>
+      `;
+    }
+    grid.innerHTML = `
+      <div class="question-card" style="text-align:center;">
+        <div class="q-chapter-tag">Lås upp alla kapitel</div>
+        <p class="q-text" style="font-size:16px;">Betala <b style="color:var(--gold-400);">299 kr</b> med Swish för att låsa upp alla 13 kapitel.</p>
+        <img src="IMG_5109.PNG" alt="Swish QR-kod" style="max-width:260px;width:100%;border-radius:8px;margin:14px 0;border:1px solid var(--card-border);">
+        <div class="explanation" style="text-align:left;">
+          <b>Så här går det till:</b><br>
+          1. Skanna QR-koden och betala 299 kr.<br>
+          2. Skriv gärna din e-postadress i Swish-meddelandet också.<br>
+          3. Klicka på knappen nedan för att meddela oss att du betalat — vi godkänner din åtkomst så snart vi ser betalningen.
+        </div>
+        ${requestSection}
+      </div>
+    `;
+    document.getElementById('startAllBtn').classList.add('hidden');
+    const reqBtn = document.getElementById('requestAccessBtn');
+    if(reqBtn) reqBtn.addEventListener('click', submitAccessRequest);
+    return;
+  }
+  document.getElementById('startAllBtn').classList.remove('hidden');
+  visibleChapters.forEach((ch) => {
+    const qCount = allQuestions.filter(q => q.chapter_id === ch.id).length;
+    const pct = progress[ch.id];
+    const origIndex = chapters.findIndex(c => c.id === ch.id);
+    const card = document.createElement('div');
+    card.className = 'chapter-card';
+    card.innerHTML = `
+      <div class="num">${String(origIndex+1).padStart(2,'0')}</div>
+      <div class="info">
+        <h3>${ch.title}</h3>
+        <span>${qCount} frågor</span>
+        <div><button class="link-book-btn" data-chapter-id="${ch.id}" data-order="${ch.order_index}" data-title="${ch.title}" style="background:none;border:none;color:var(--gold-400);font-family:sans-serif;font-size:12px;padding:0;margin-top:4px;cursor:pointer;text-decoration:underline;">📖 Läs boken</button></div>
+      </div>
+      <div class="badge ${pct!==undefined ? 'done':''}">${pct!==undefined ? pct+'%' : 'Ej gjort'}</div>
+    `;
+    card.addEventListener('click', (e) => {
+      if(e.target.closest('.link-book-btn')) return; // handled separately below
+      startQuiz(ch.id, ch.title);
+    });
+    card.querySelector('.link-book-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openBookViewer(ch.id, ch.order_index, ch.title);
+    });
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('chipShuffleQ').addEventListener('click', function(){
+  shuffleQ = !shuffleQ; this.classList.toggle('active', shuffleQ);
+});
+document.getElementById('chipShuffleO').addEventListener('click', function(){
+  shuffleO = !shuffleO; this.classList.toggle('active', shuffleO);
+});
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function prepareQuestions(list){
+  let qs = list.map(q => ({...q}));
+  if(shuffleQ) qs = shuffleArray(qs);
+  if(shuffleO){
+    qs = qs.map(q => {
+      const optWithIdx = q.options.map((text, idx) => ({text, isCorrect: idx === q.correct_index}));
+      const shuffled = shuffleArray(optWithIdx);
+      const newCorrect = shuffled.findIndex(o => o.isCorrect);
+      return {...q, options: shuffled.map(o => o.text), correct_index: newCorrect};
+    });
+  }
+  return qs;
+}
+
+/* ---------------- Quiz flow ---------------- */
+function startQuiz(chapterId, chapterTitle){
+  if(chapterId === 'all'){
+    baseQuestions = allQuestions.map(q => ({...q, chapter_title: chapters.find(c=>c.id===q.chapter_id)?.title || ''}));
+    currentChapterLabel = 'Alla kapitel';
+    currentChapterId = null;
+  } else {
+    baseQuestions = allQuestions.filter(q => q.chapter_id === chapterId).map(q => ({...q, chapter_title: chapterTitle}));
+    currentChapterLabel = chapterTitle;
+    currentChapterId = chapterId;
+  }
+  currentQuestions = prepareQuestions(baseQuestions);
+  currentIdx = 0; score = 0; missed = [];
+  showScreen('quiz');
+  renderQuestion();
+}
+document.getElementById('startAllBtn').addEventListener('click', () => startQuiz('all', 'Alla kapitel'));
+
+document.getElementById('quickReviewBtn').addEventListener('click', async () => {
+  const { data: reviewIds, error } = await supabase.from('quick_review_questions').select('question_id');
+  if(error || !reviewIds){
+    alert('Kunde inte hämta Snabbläst-frågorna just nu.');
+    return;
+  }
+  const idSet = new Set(reviewIds.map(r => r.question_id));
+  // Filtrerar mot allQuestions, som redan är åtkomstbegränsat (RLS) —
+  // en elev ser bara snabbläst-frågor från kapitel de faktiskt har tillgång till.
+  const available = allQuestions.filter(q => idSet.has(q.id));
+  if(available.length === 0){
+    alert('Du behöver ha tillgång till minst ett kapitel för att använda Snabbläst.');
+    return;
+  }
+  baseQuestions = available.map(q => ({...q, chapter_title: chapters.find(c=>c.id===q.chapter_id)?.title || ''}));
+  currentChapterLabel = `Snabbläst (${available.length} frågor)`;
+  currentChapterId = null;
+  currentQuestions = prepareQuestions(baseQuestions);
+  currentIdx = 0; score = 0; missed = [];
+  showScreen('quiz');
+  renderQuestion();
+});
+
+function renderQuestion(){
+  answered = false;
+  const q = currentQuestions[currentIdx];
+  document.getElementById('qChapterTag').textContent = q.chapter_title;
+  document.getElementById('qText').textContent = q.question_text;
+  document.getElementById('progressLabel').textContent = `Fråga ${currentIdx+1} av ${currentQuestions.length}`;
+  document.getElementById('progressFill').style.width = `${(currentIdx/currentQuestions.length)*100}%`;
+  document.getElementById('explanationBox').classList.add('hidden');
+  document.getElementById('nextBtn').classList.remove('show');
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectAnswer(idx));
+    wrap.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx){
+  if(answered) return;
+  answered = true;
+  const q = currentQuestions[currentIdx];
+  document.querySelectorAll('.option').forEach((btn, i) => {
+    btn.classList.add('locked');
+    if(i === q.correct_index) btn.classList.add('correct');
+    else if(i === idx) btn.classList.add('wrong');
+  });
+  const wasCorrect = idx === q.correct_index;
+  if(wasCorrect) score++;
+  else missed.push({q: q.question_text, correct: q.options[q.correct_index]});
+  q._wasCorrect = wasCorrect; // store for DB write at end
+  const box = document.getElementById('explanationBox');
+  box.innerHTML = `<b>${wasCorrect ? 'Rätt! ' : 'Rätt svar: ' + q.options[q.correct_index] + '. '}</b>${q.explanation}`;
+  box.classList.remove('hidden');
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  currentIdx++;
+  if(currentIdx >= currentQuestions.length) showResults();
+  else renderQuestion();
+});
+
+document.getElementById('backBtn').addEventListener('click', () => showScreen('select'));
+
+/* ---------------- Results + save to Supabase ---------------- */
+function drawDiploma(chapterName, pct){
+  const canvas = document.getElementById('diplomaCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0f1f38'; ctx.fillRect(0,0,1000,700);
+  ctx.strokeStyle = '#c9a24b'; ctx.lineWidth = 6; ctx.strokeRect(30,30,940,640);
+  ctx.strokeStyle = '#dab968'; ctx.lineWidth = 1; ctx.strokeRect(46,46,908,608);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#dab968'; ctx.font = '16px Georgia'; ctx.fillText('SVERIGE I FOKUS — MEDBORGARSKAPSPROV', 500, 130);
+  ctx.fillStyle = '#f7f4ed'; ctx.font = 'bold 44px Georgia'; ctx.fillText('Diplom', 500, 210);
+  ctx.font = '20px Georgia'; ctx.fillText(currentProfile ? currentProfile.display_name : '', 500, 280);
+  ctx.font = 'bold 60px Georgia'; ctx.fillStyle = '#c9a24b'; ctx.fillText(pct + '%', 500, 380);
+  ctx.font = '20px Georgia'; ctx.fillStyle = '#c7d2e3'; ctx.fillText('rätt på quizet: ' + chapterName, 500, 430);
+  ctx.font = '15px Georgia'; ctx.fillText(new Date().toLocaleDateString('sv-SE'), 500, 490);
+  return canvas.toDataURL('image/png');
+}
+
+async function saveAttempt(pct){
+  try{
+    const { data: attempt, error } = await supabase.from('attempts').insert({
+      user_id: currentUser.id,
+      chapter_id: currentChapterId,
+      score: score,
+      total_questions: currentQuestions.length
+    }).select().single();
+    if(error || !attempt) return;
+    const rows = currentQuestions.map(q => ({
+      attempt_id: attempt.id,
+      question_id: q.id,
+      was_correct: !!q._wasCorrect
+    }));
+    await supabase.from('attempt_answers').insert(rows);
+  } catch(e){ console.warn('Kunde inte spara resultat:', e); }
+}
+
+async function loadLeaderboard(){
+  const box = document.getElementById('leaderboardList');
+  let query = supabase.from('leaderboard').select('*').order('best_percent', { ascending: false }).limit(10);
+  if(currentChapterId === null) query = query.is('chapter_id', null);
+  else query = query.eq('chapter_id', currentChapterId);
+  const { data } = await query;
+  if(!data || data.length === 0){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  box.innerHTML = '<h4>Topplista — ' + currentChapterLabel + '</h4>' + data.map((row, i) => `
+    <div class="lb-row"><span><span class="rank">#${i+1}</span> ${row.display_name}</span><b>${row.best_percent}%</b></div>
+  `).join('');
+}
+
+async function showResults(){
+  const pct = Math.round((score/currentQuestions.length)*100);
+  await saveAttempt(pct);
+  showScreen('results');
+
+  document.getElementById('resultsChapterName').textContent = currentChapterLabel.toUpperCase();
+  document.getElementById('scoreText').textContent = `${score}/${currentQuestions.length}`;
+  document.getElementById('scorePercent').textContent = `${pct}% rätt`;
+  let msg = '';
+  if(pct === 100) msg = 'Perfekt! Du kan det här kapitlet utan och innan.';
+  else if(pct >= 80) msg = 'Mycket bra! Bara några detaljer kvar att repetera.';
+  else if(pct >= 60) msg = 'Bra jobbat. Gå igenom de missade frågorna och försök igen.';
+  else msg = 'Bra start! Läs kapitlet igen och testa quizet på nytt.';
+  document.getElementById('resultsMsg').textContent = msg;
+
+  const diplomaArea = document.getElementById('diplomaArea');
+  diplomaArea.innerHTML = '';
+  if(pct >= 80){
+    const dataUrl = drawDiploma(currentChapterLabel, pct);
+    diplomaArea.innerHTML = `<div class="diploma-badge">🏅 Du klarade ${pct}%!</div>`;
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `diplom-${currentChapterLabel.replace(/\s+/g,'-')}.png`;
+    link.className = 'btn-secondary';
+    link.style.display = 'inline-block';
+    link.style.marginTop = '10px';
+    link.style.textDecoration = 'none';
+    link.textContent = '⬇ Ladda ner diplom';
+    diplomaArea.appendChild(link);
+  }
+
+  const missedList = document.getElementById('missedList');
+  if(missed.length > 0){
+    missedList.classList.remove('hidden');
+    missedList.innerHTML = '<h4>Frågor att repetera</h4>' + missed.map(m => `
+      <div class="missed-item"><b>${m.q}</b>Rätt svar: <span class="correct-answer">${m.correct}</span></div>
+    `).join('');
+  } else missedList.classList.add('hidden');
+
+  await loadLeaderboard();
+  await renderChapterGrid();
+}
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  currentQuestions = prepareQuestions(baseQuestions);
+  currentIdx = 0; score = 0; missed = [];
+  showScreen('quiz');
+  renderQuestion();
+});
+document.getElementById('toChaptersBtn').addEventListener('click', () => showScreen('select'));
+
+/* ---------------- Book viewer (Läs boken) ---------------- */
+let currentBookChapterOrder = null;
+let currentBookFile = 'tigrinja.pdf';
+
+async function openBookViewer(chapterId, orderIndex, chapterTitle){
+  currentBookChapterOrder = orderIndex;
+  document.getElementById('bookChapterTag').textContent = chapterTitle;
+  showScreen('book');
+  switchBookTab('tigrinja');
+}
+
+async function switchBookTab(which){
+  document.getElementById('bookTabTigrinja').classList.toggle('active', which === 'tigrinja');
+  document.getElementById('bookTabSvenska').classList.toggle('active', which === 'svenska');
+  document.getElementById('bookTabOrd').classList.toggle('active', which === 'ord');
+
+  const fileMap = { tigrinja: 'tigrinja.pdf', svenska: 'latt-svenska.pdf', ord: 'viktiga-ord.pdf' };
+  currentBookFile = fileMap[which];
+  await loadBookFile();
+}
+
+async function loadBookFile(){
+  const loadingMsg = document.getElementById('bookLoadingMsg');
+  const iframe = document.getElementById('bookIframe');
+  iframe.classList.add('hidden');
+  loadingMsg.classList.remove('hidden');
+  loadingMsg.textContent = 'Laddar...';
+
+  const path = `${currentBookChapterOrder}/${currentBookFile}`;
+  const { data, error } = await supabase.storage.from('chapter-materials').createSignedUrl(path, 3600);
+
+  if(error || !data){
+    loadingMsg.textContent = 'Den här filen är inte tillgänglig än för det här kapitlet.';
+    return;
+  }
+  loadingMsg.innerHTML = `
+    <div style="text-align:center;">
+      <p style="margin-bottom:20px;">Dokumentet öppnas bäst i en egen flik för bästa läsupplevelse på både mobil och dator.</p>
+      <a href="${data.signedUrl}" target="_blank" rel="noopener" class="btn-primary" style="display:inline-block;text-decoration:none;">📄 Öppna dokument</a>
+    </div>
+  `;
+}
+
+document.getElementById('bookTabTigrinja').addEventListener('click', () => switchBookTab('tigrinja'));
+document.getElementById('bookTabSvenska').addEventListener('click', () => switchBookTab('svenska'));
+document.getElementById('bookTabOrd').addEventListener('click', () => switchBookTab('ord'));
+document.getElementById('bookBackBtn').addEventListener('click', () => showScreen('select'));
+document.getElementById('adminBtn').addEventListener('click', async () => {
+  showScreen('admin');
+  switchAdminTab('students');
+  renderChapterCheckboxes();
+  await loadStudentsList();
+});
+document.getElementById('adminBackBtn').addEventListener('click', () => showScreen('select'));
+
+function switchAdminTab(tab){
+  document.getElementById('adminTabStudents').classList.toggle('hidden', tab !== 'students');
+  document.getElementById('adminTabRequests').classList.toggle('hidden', tab !== 'requests');
+  document.getElementById('adminTabQuestions').classList.toggle('hidden', tab !== 'questions');
+  document.getElementById('adminTabStats').classList.toggle('hidden', tab !== 'stats');
+  document.getElementById('tabStudents').classList.toggle('active', tab === 'students');
+  document.getElementById('tabRequests').classList.toggle('active', tab === 'requests');
+  document.getElementById('tabQuestions').classList.toggle('active', tab === 'questions');
+  document.getElementById('tabStats').classList.toggle('active', tab === 'stats');
+  if(tab === 'requests') loadRequestsList();
+  if(tab === 'questions') initQuestionsTab();
+  if(tab === 'stats') loadAdminStats();
+}
+document.getElementById('tabStudents').addEventListener('click', () => switchAdminTab('students'));
+document.getElementById('tabRequests').addEventListener('click', () => switchAdminTab('requests'));
+document.getElementById('tabQuestions').addEventListener('click', () => switchAdminTab('questions'));
+document.getElementById('tabStats').addEventListener('click', () => switchAdminTab('stats'));
+
+async function loadRequestsList(){
+  const list = document.getElementById('requestsList');
+  list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Laddar...</p>';
+  const { data, error } = await supabase.rpc('admin_list_pending_requests');
+  if(error){
+    list.innerHTML = `<p style="font-family:sans-serif;color:var(--fg-soft);">Kunde inte hämta förfrågningar: ${error.message}</p>`;
+    return;
+  }
+  if(!data || data.length === 0){
+    list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Inga väntande förfrågningar just nu.</p>';
+    return;
+  }
+  list.innerHTML = data.map(r => `
+    <div class="admin-row">
+      <div>
+        <b>${r.display_name}</b>
+        <span style="color:var(--fg-soft);">${r.email}</span><br>
+        <span style="color:var(--fg-soft);font-size:11.5px;">${new Date(r.requested_at).toLocaleString('sv-SE')}</span>
+      </div>
+      <button class="btn-primary" style="padding:8px 16px;font-size:12.5px;white-space:nowrap;" onclick="window.__approveRequest(${r.request_id})">✅ Godkänn (alla kapitel)</button>
+    </div>
+  `).join('');
+}
+
+window.__approveRequest = async function(requestId){
+  const { error } = await supabase.rpc('admin_approve_request', { p_request_id: requestId });
+  if(error){ alert('Kunde inte godkänna: ' + error.message); return; }
+  await loadRequestsList();
+  await loadStudentsList();
+};
+
+/* --- Elever tab --- */
+function renderChapterCheckboxes(){
+  const box = document.getElementById('chapterCheckboxes');
+  box.innerHTML = chapters.map(ch => `
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+      <input type="checkbox" class="grantChk" value="${ch.id}"> ${ch.title}
+    </label>
+  `).join('');
+}
+
+async function loadStudentsList(){
+  const list = document.getElementById('studentsList');
+  list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Laddar...</p>';
+  const { data, error } = await supabase.rpc('admin_list_users');
+  if(error || !data){
+    list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Kunde inte hämta elevlistan.</p>';
+    return;
+  }
+  list.innerHTML = data.map(u => `
+    <div class="admin-row" style="flex-direction:column;align-items:flex-start;">
+      <b>${u.display_name} <span style="color:var(--fg-soft);font-weight:400;">(${u.email})</span></b>
+      <span style="color:var(--fg-soft);font-size:12.5px;">${u.granted_chapters && u.granted_chapters.length ? u.granted_chapters.join(', ') : 'Ingen åtkomst än'}</span>
+    </div>
+  `).join('');
+}
+
+document.getElementById('grantSelectedBtn').addEventListener('click', async () => {
+  const email = document.getElementById('grantEmailInput').value.trim().toLowerCase();
+  const chapterIds = Array.from(document.querySelectorAll('.grantChk:checked')).map(c => parseInt(c.value));
+  const msg = document.getElementById('grantMsg');
+  msg.classList.remove('hidden');
+  if(!email || chapterIds.length === 0){
+    msg.style.color = '#e88a80';
+    msg.textContent = 'Fyll i e-post och välj minst ett kapitel.';
+    return;
+  }
+  const { error } = await supabase.rpc('admin_grant_access', { p_email: email, p_chapter_ids: chapterIds });
+  if(error){
+    msg.style.color = '#e88a80';
+    if(error.message && error.message.includes('Ingen användare hittades')){
+      msg.textContent = `⚠️ Ingen elev hittades med e-posten "${email}". Kontrollera att eleven har skapat ett konto i appen FÖRST (samma e-post de skrev till dig), innan du ger åtkomst.`;
+    } else {
+      msg.textContent = error.message;
+    }
+    return;
+  }
+  msg.style.color = '#8fd9ab';
+  msg.textContent = `✅ Åtkomst given till ${chapterIds.length} kapitel för ${email}.`;
+  await loadStudentsList();
+});
+
+document.getElementById('grantAllBtn').addEventListener('click', async () => {
+  const email = document.getElementById('grantEmailInput').value.trim().toLowerCase();
+  const msg = document.getElementById('grantMsg');
+  msg.classList.remove('hidden');
+  if(!email){ msg.style.color = '#e88a80'; msg.textContent = 'Fyll i e-post.'; return; }
+  const { error } = await supabase.rpc('admin_grant_all_access', { p_email: email });
+  if(error){
+    msg.style.color = '#e88a80';
+    if(error.message && error.message.includes('Ingen användare hittades')){
+      msg.textContent = `⚠️ Ingen elev hittades med e-posten "${email}". Kontrollera att eleven har skapat ett konto i appen FÖRST (samma e-post de skrev till dig), innan du ger åtkomst.`;
+    } else {
+      msg.textContent = error.message;
+    }
+    return;
+  }
+  msg.style.color = '#8fd9ab';
+  msg.textContent = `✅ Full åtkomst (alla kapitel) given till ${email}.`;
+  await loadStudentsList();
+});
+
+/* --- Frågor tab --- */
+let editingQuestionId = null;
+function initQuestionsTab(){
+  const sel = document.getElementById('questionChapterSelect');
+  sel.innerHTML = chapters.map(ch => `<option value="${ch.id}">${ch.title}</option>`).join('');
+  sel.onchange = renderQuestionsAdminList;
+  renderQuestionsAdminList();
+}
+
+function renderQuestionsAdminList(){
+  const chapterId = parseInt(document.getElementById('questionChapterSelect').value);
+  const list = document.getElementById('questionsAdminList');
+  const qs = allQuestions.filter(q => q.chapter_id === chapterId);
+  list.innerHTML = qs.map(q => `
+    <div class="admin-row">
+      <div style="flex:1;"><b>${q.question_text}</b>Rätt: ${q.options[q.correct_index]}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-secondary" style="padding:6px 10px;font-size:12px;" onclick="window.__editQ(${q.id})">Ändra</button>
+        <button class="btn-secondary" style="padding:6px 10px;font-size:12px;color:#e88a80;" onclick="window.__deleteQ(${q.id})">Ta bort</button>
+      </div>
+    </div>
+  `).join('') || '<p style="font-family:sans-serif;color:var(--fg-soft);">Inga frågor i det här kapitlet än.</p>';
+}
+
+function renderOptionInputs(options, correctIdx){
+  const wrap = document.getElementById('qFormOptions');
+  wrap.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    row.innerHTML = `
+      <input type="radio" name="qFormCorrect" value="${i}" ${i===correctIdx?'checked':''}>
+      <input type="text" class="qFormOptText" placeholder="Alternativ ${i+1}" value="${options && options[i] ? options[i].replace(/"/g,'&quot;') : ''}" style="flex:1;padding:9px 11px;border-radius:6px;border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:sans-serif;font-size:13.5px;">
+    `;
+    wrap.appendChild(row);
+  }
+}
+
+document.getElementById('newQuestionBtn').addEventListener('click', () => {
+  editingQuestionId = null;
+  document.getElementById('editFormTitle').textContent = 'Ny fråga';
+  document.getElementById('qFormText').value = '';
+  document.getElementById('qFormExplanation').value = '';
+  renderOptionInputs(['','','',''], 0);
+  document.getElementById('questionFormMsg').classList.add('hidden');
+  document.getElementById('questionEditForm').classList.remove('hidden');
+});
+
+document.getElementById('cancelQuestionBtn').addEventListener('click', () => {
+  document.getElementById('questionEditForm').classList.add('hidden');
+});
+
+window.__editQ = function(id){
+  const q = allQuestions.find(x => x.id === id);
+  if(!q) return;
+  editingQuestionId = id;
+  document.getElementById('editFormTitle').textContent = 'Ändra fråga';
+  document.getElementById('qFormText').value = q.question_text;
+  document.getElementById('qFormExplanation').value = q.explanation;
+  renderOptionInputs(q.options, q.correct_index);
+  document.getElementById('questionFormMsg').classList.add('hidden');
+  document.getElementById('questionEditForm').classList.remove('hidden');
+  document.getElementById('questionEditForm').scrollIntoView({behavior:'smooth'});
+};
+
+window.__deleteQ = async function(id){
+  if(!confirm('Ta bort den här frågan permanent?')) return;
+  const { error } = await supabase.from('questions').delete().eq('id', id);
+  if(error){ alert('Kunde inte ta bort: ' + error.message); return; }
+  allQuestions = allQuestions.filter(q => q.id !== id);
+  renderQuestionsAdminList();
+};
+
+document.getElementById('saveQuestionBtn').addEventListener('click', async () => {
+  const chapterId = parseInt(document.getElementById('questionChapterSelect').value);
+  const text = document.getElementById('qFormText').value.trim();
+  const explanation = document.getElementById('qFormExplanation').value.trim();
+  const options = Array.from(document.querySelectorAll('.qFormOptText')).map(i => i.value.trim());
+  const correctRadio = document.querySelector('input[name="qFormCorrect"]:checked');
+  const msg = document.getElementById('questionFormMsg');
+  msg.classList.remove('hidden');
+
+  if(!text || !explanation || options.some(o => !o) || !correctRadio){
+    msg.style.color = '#e88a80';
+    msg.textContent = 'Fyll i frågetext, alla 4 alternativ, förklaring, och markera rätt svar.';
+    return;
+  }
+  const correct_index = parseInt(correctRadio.value);
+  const payload = { chapter_id: chapterId, question_text: text, options: options, correct_index, explanation };
+
+  let error;
+  if(editingQuestionId){
+    ({ error } = await supabase.from('questions').update(payload).eq('id', editingQuestionId));
+  } else {
+    ({ error } = await supabase.from('questions').insert(payload));
+  }
+  if(error){ msg.style.color = '#e88a80'; msg.textContent = error.message; return; }
+
+  msg.style.color = '#8fd9ab';
+  msg.textContent = 'Sparat!';
+  const { data: qData } = await supabase.from('questions').select('*');
+  allQuestions = qData || [];
+  renderQuestionsAdminList();
+  setTimeout(() => document.getElementById('questionEditForm').classList.add('hidden'), 700);
+});
+
+/* --- Statistik tab --- */
+async function loadAdminStats(){
+  const list = document.getElementById('adminStatsList');
+  list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Laddar...</p>';
+  const { data, error } = await supabase.from('question_stats').select('*').order('wrong_percent', { ascending: false }).limit(30);
+  if(error || !data || data.length === 0){
+    list.innerHTML = '<p style="font-family:sans-serif;color:var(--fg-soft);">Ingen statistik än — den byggs upp allteftersom elever gör quiz.</p>';
+    return;
+  }
+  list.innerHTML = data.map(row => `
+    <div class="admin-row">
+      <div><b>${row.question_text}</b>${row.chapter_title} — ${row.wrong_count}/${row.total_answers} fel</div>
+      <div class="pct">${row.wrong_percent}%</div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>
