@@ -613,7 +613,6 @@ async function renderChapterGrid(){
     const requestStatus = await getMyRequestStatus();
     const isPending = requestStatus === 'pending';
     const isRejected = requestStatus === 'rejected';
-    const expandSwish = isPending || isRejected;
 
     let statusNotice = '';
     if(isPending){
@@ -636,8 +635,8 @@ async function renderChapterGrid(){
         <p class="q-text" style="font-size:16px;">Få direkt tillgång till alla 13 kapitel för <b style="color:var(--gold-400);">299 kr</b>.</p>
         <button class="btn-primary" id="stripeCheckoutBtn" style="width:100%;padding:17px;font-size:15.5px;margin-top:10px;">💳 Betala med kort, Apple Pay eller Google Pay — direkt tillgång (299 kr)</button>
         <div class="auth-error hidden" id="stripeCheckoutMsg" style="margin-top:10px;"></div>
-        <button id="swishToggle" style="background:none;border:none;color:var(--fg-soft);font-family:'Helvetica Neue',Arial,sans-serif;font-size:12.5px;text-decoration:underline;cursor:pointer;margin-top:18px;padding:0;">${expandSwish ? '▲ Dölj Swish' : 'Föredrar du Swish?'}</button>
-        <div id="swishPanel" class="${expandSwish ? '' : 'hidden'}" style="margin-top:14px;text-align:left;">
+        <div style="margin:18px 0 4px;color:var(--fg-soft);font-size:12px;text-transform:uppercase;letter-spacing:.08em;">eller</div>
+        <div style="margin-top:14px;text-align:left;">
           ${statusNotice}
           <img src="IMG_5109.PNG" alt="Swish QR-kod" style="max-width:220px;width:100%;border-radius:8px;margin:12px auto;display:block;border:1px solid var(--card-border);">
           ${requestSection}
@@ -647,12 +646,6 @@ async function renderChapterGrid(){
     document.getElementById('startAllBtn').classList.add('hidden');
     document.getElementById('quickReviewBtn').classList.add('hidden');
     document.getElementById('stripeCheckoutBtn').addEventListener('click', startStripeCheckout);
-    const swishToggleBtn = document.getElementById('swishToggle');
-    const swishPanel = document.getElementById('swishPanel');
-    swishToggleBtn.addEventListener('click', () => {
-      const nowHidden = swishPanel.classList.toggle('hidden');
-      swishToggleBtn.textContent = nowHidden ? 'Föredrar du Swish?' : '▲ Dölj Swish';
-    });
     const reqBtn = document.getElementById('requestAccessBtn');
     if(reqBtn) reqBtn.addEventListener('click', submitAccessRequest);
     return;
