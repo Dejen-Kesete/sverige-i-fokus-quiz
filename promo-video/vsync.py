@@ -26,7 +26,7 @@ fo = np.frombuffer(ro, np.uint8).reshape(-1, 55, 54).astype(np.float32)
 rs = motion("src.mov", "crop=608:1080:656:0,scale=54:96")
 fs = np.frombuffer(rs, np.uint8).reshape(-1, 96, 54).astype(np.float32)
 mo = np.abs(np.diff(fo, axis=0)).mean((1, 2)); ms = np.abs(np.diff(fs, axis=0)).mean((1, 2))
-host = [(0.2, 4.7), (10.8, 12.8), (15.2, 18.5), (30.6, 32.5), (45.8, 48.9), (81.2, 82.7)]
+host = [(0.5, 4.7), (10.8, 12.8), (15.2, 18.5), (30.6, 32.5), (45.8, 48.9), (81.2, 82.7)]
 for a, b in host:
     i0, i1 = int(a * FPS), int(b * FPS)
     x = mo[i0:i1]; x = (x - x.mean()) / (x.std() + 1e-6)

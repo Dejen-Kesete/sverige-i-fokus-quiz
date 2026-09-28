@@ -34,7 +34,8 @@ Timings in `gen_ass.py` are in source seconds and match the cuts of the original
 | `compose.py` | Builds the vertical base video one output frame per source frame (lip sync by construction): face-tracked wide/tight crops, reframed footage, B-roll and end card. |
 | `gen_ass_v.py` | Vertical graphics (EN/SV), kept inside TikTok's safe zone. |
 | `render_v.sh` | Adds graphics and audio, writes a master and a <30 MB share copy. |
-| `vsync.py` | Verifies the output: voice offset (ms) and per-segment picture offset (frames) against the source. |
+| `vsync.py` | Verifies the voice offset (ms) in the output against the processed voice. |
+| `vcheck.py` | Strict picture-sync test: rebuilds sampled frames from neighbouring source frames and confirms offset 0. |
 
 ```bash
 python3 faces.py src.mov faces_src.json
