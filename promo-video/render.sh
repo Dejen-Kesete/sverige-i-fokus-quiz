@@ -7,21 +7,17 @@ OFF=3.5; END0=82.76; TOT=106.5
 
 # ---------- audio: polished voice + ducked score + sfx, then linear gain to -14 LUFS
 if [ ! -f mix_raw.wav ]; then
-ffmpeg -hide_banner -loglevel error -y -i src.mov -i music.wav -i sfx.wav -filter_complex "
-[0:a]aformat=sample_rates=44100:channel_layouts=stereo,highpass=f=80,
- equalizer=f=250:t=q:w=1.2:g=-2.5,equalizer=f=4200:t=q:w=1.4:g=2.5,equalizer=f=11000:t=h:w=2000:g=1.5,
- acompressor=threshold=-24dB:ratio=3:attack=8:release=180:makeup=3,
- loudnorm=I=-16:LRA=8:TP=-2,aresample=44100,
- adelay=${OFF}s:all=1,apad=whole_dur=${TOT},asplit[v1][v2];
-[1:a]volume=-3dB[mu];
-[mu][v2]sidechaincompress=threshold=0.03:ratio=4:attack=30:release=500:makeup=1[md];
-[v1][md][2:a]amix=inputs=3:weights='1 1 1':normalize=0,atrim=0:${TOT}[a]" -map "[a]" -c:a pcm_f32le mix_raw.wav
+# voice chain on its own (verified to add no time shift), then sample-exact placement in mix.py
+ffmpeg -hide_banner -loglevel error -y -i src.mov -af "aformat=sample_rates=44100:channel_layouts=stereo,highpass=f=80,equalizer=f=250:t=q:w=1.2:g=-2.5,equalizer=f=4200:t=q:w=1.4:g=2.5,equalizer=f=11000:t=h:w=2000:g=1.5,acompressor=threshold=-24dB:ratio=3:attack=8:release=180:makeup=3,loudnorm=I=-16:LRA=8:TP=-2,aresample=44100" -c:a pcm_f32le voice.wav
+# the intro clip is a whole number of frames; offset the voice by exactly that length
+AOFF=$(python3 -c "print(round($OFF*25)/25)")
+python3 mix.py voice.wav music.wav sfx.wav $AOFF $TOT mix_raw.wav
 fi
 if [ ! -f mix.wav ]; then
 I=$(ffmpeg -hide_banner -i mix_raw.wav -af ebur128=peak=true -f null - 2>&1 | awk '/Integrated/{f=1} f&&/I:/{print $2; exit}')
 G=$(python3 -c "print(round(-14.0-($I),2))")
 echo "mix loudness $I LUFS -> gain $G dB"
-ffmpeg -hide_banner -loglevel error -y -i mix_raw.wav -af "volume=${G}dB,alimiter=limit=0.89:attack=3:release=60:level=disabled,afade=t=in:d=0.3,afade=t=out:st=$(python3 -c "print($TOT-1.2)"):d=1.2" -c:a pcm_f32le mix.wav
+ffmpeg -hide_banner -loglevel error -y -i mix_raw.wav -af "volume=${G}dB,alimiter=limit=0.89:attack=3:release=60:level=disabled:latency=1,afade=t=in:d=0.3,afade=t=out:st=$(python3 -c "print($TOT-1.2)"):d=1.2" -c:a pcm_f32le mix.wav
 fi
 
 # ---------- video

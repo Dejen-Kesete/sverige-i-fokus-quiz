@@ -1,13 +1,13 @@
 # Renders the animated end-card background: navy gradient, drifting gold bokeh,
 # light sweep, and a circular studio-mic logo with a gold ring.
-import numpy as np, subprocess, sys
+import numpy as np, subprocess, sys, os
 from PIL import Image, ImageDraw, ImageFilter
 
-W, H, FPS = 1920, 1080, 25
+W, H, FPS = int(os.environ.get("EW", 1920)), int(os.environ.get("EH", 1080)), 25
 DUR = float(sys.argv[1]) if len(sys.argv) > 1 else 20.24
 N = int(round(DUR * FPS))
 OUT = sys.argv[3] if len(sys.argv) > 3 else "endbg.mp4"
-USE_LOGO = OUT == "endbg.mp4"
+USE_LOGO = OUT.startswith("endbg")
 rng = np.random.default_rng(7 if USE_LOGO else 21)
 
 # --- background gradient
@@ -45,7 +45,7 @@ add(55, 8, 22, 0.14, 0.34, 22, False)       # mid bokeh
 add(14, 45, 90, 0.04, 0.10, 32, False)      # large foreground bokeh
 
 # --- logo (studio mic still, circular)
-LOGO_D = 232
+LOGO_D = int(os.environ.get("LD", 232))
 src = Image.open(sys.argv[2] if len(sys.argv) > 2 else "st/logo_mic.png").convert("RGB")
 sw, sh = src.size
 side = min(sw, sh)
@@ -61,7 +61,7 @@ ry, rx = np.mgrid[0:R, 0:R].astype(np.float32) - (R - 1) / 2
 rd = np.sqrt(rx * rx + ry * ry)
 ring = np.clip(1 - np.abs(rd - LOGO_D / 2 - 3) / 2.2, 0, 1)
 glow = np.exp(-((rd - LOGO_D / 2) / 16) ** 2) * 0.35 * (rd > LOGO_D / 2)
-LOGO_CX, LOGO_CY = W // 2, 318
+LOGO_CX, LOGO_CY = W // 2, int(os.environ.get("LCY", 318))
 
 def ease_out_back(t):
     c1 = 1.4; c3 = c1 + 1

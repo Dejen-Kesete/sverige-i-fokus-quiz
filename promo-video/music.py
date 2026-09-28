@@ -1,11 +1,12 @@
 # Synthesizes a subtle cinematic score + motion-graphics SFX for the promo.
 # Output: music.wav (score) and sfx.wav (whooshes/hits), 44.1 kHz stereo float32 WAV.
-import numpy as np
+import numpy as np, os
 from scipy.signal import fftconvolve, butter, sosfilt
 from scipy.io import wavfile
 
 SR = 44100
-OFF = 3.5
+VERT = bool(os.environ.get("VERT"))
+OFF = 0.0 if VERT else 3.5
 TOTAL = 103.0 + OFF
 N = int(TOTAL * SR)
 rng = np.random.default_rng(3)
@@ -30,6 +31,7 @@ def bp(x, lo, hi):
 
 def place(buf, sig, t0, gain=1.0):
     i = int(t0 * SR)
+    if i < 0: sig, i = sig[-i:], 0
     if i >= len(buf): return
     j = min(len(buf), i + len(sig)); buf[i:j] += sig[:j - i] * gain
 
@@ -143,11 +145,27 @@ def shimmer(dur=2.5):
     return out / np.abs(out).max()
 
 S = lambda s: s + OFF  # source time -> timeline
-place(sfx, boom(), 1.15, 0.55)                 # intro title
-place(sfx, whoosh(1.2, 200, 3000), 0.55, 0.10)  # curtain / bars opening
-place(sfx, whoosh(0.8, 400, 6000, True), OFF - 0.55, 0.12)  # into the host
-for t0 in (0.6, 7.2, 20.35, 36.55, 52.8, 64.0, 71.3, 76.35):
-    place(sfx, whoosh(0.75), S(t0) - 0.25, 0.10)
+def tick(f=2400, dur=0.05):
+    n = int(dur * SR); tt = np.arange(n) / SR
+    x = np.sin(2 * np.pi * f * tt) * np.exp(-tt * 90) + 0.3 * rng.standard_normal(n) * np.exp(-tt * 200)
+    return np.stack([x, x], 1) / np.abs(x).max()
+if not VERT:
+    place(sfx, boom(), 1.15, 0.55)                 # intro title
+    place(sfx, whoosh(1.2, 200, 3000), 0.55, 0.10)  # curtain / bars opening
+    place(sfx, whoosh(0.8, 400, 6000, True), OFF - 0.55, 0.12)  # into the host
+    for t0 in (0.6, 7.2, 20.35, 36.55, 52.8, 64.0, 71.3, 76.35):
+        place(sfx, whoosh(0.75), S(t0) - 0.25, 0.10)
+else:
+    place(sfx, boom(), 0.25, 0.40)                 # hook title
+    for t0 in (7.3, 18.9, 25.0, 32.6, 36.5, 49.0, 52.8, 62.64, 67.6, 71.0, 76.3, 78.8):
+        place(sfx, whoosh(0.7), t0 - 0.25, 0.09)
+    for k in range(18):                            # typing on the translation card
+        place(sfx, tick(1800 + 300 * (k % 3), 0.035), 32.6 + 0.55 + k * 0.056, 0.05)
+    place(sfx, tick(1200, 0.08), 62.64 + 2.0, 0.12)  # tap on the phone
+    place(sfx, shimmer(), 62.64 + 2.05, 0.05)
+    for i in range(5):                             # checklist ticks
+        place(sfx, tick(2600, 0.05), 78.8 + 0.3 + 0.2 * i, 0.09)
+    place(sfx, boom(1.2), 78.8 + 1.45, 0.25)        # stamp
 place(sfx, boom(), S(82.76) + 0.2, 0.45)
 place(sfx, shimmer(), S(82.76) + 1.0, 0.10)
 place(sfx, whoosh(1.0, 300, 7000), S(82.76 + 10.2) - 0.2, 0.11)
@@ -155,6 +173,7 @@ place(sfx, shimmer(), S(82.76 + 10.55), 0.09)
 
 def write(name, x):
     wavfile.write(name, SR, (x / max(1.0, np.abs(x).max() / 0.95)).astype(np.float32))
-write("music.wav", music)
-write("sfx.wav", sfx)
+sfx_ = "_v" if VERT else ""
+write(f"music{sfx_}.wav", music)
+write(f"sfx{sfx_}.wav", sfx)
 print("peak music", np.abs(music).max(), "rms", np.sqrt((music ** 2).mean()))
