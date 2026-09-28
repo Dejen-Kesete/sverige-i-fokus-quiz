@@ -25,7 +25,7 @@ ffmpeg -hide_banner -loglevel error -y -i mix_raw.wav -af "volume=${G}dB,alimite
 fi
 
 # ---------- video
-GRADE="format=gbrp,split[ga][gb];[gb]curves=master='0/0 0.62/0 1/1',gblur=sigma=30[gbl];[ga][gbl]blend=all_mode=screen:all_opacity=0.2,format=yuv420p,eq=contrast=1.04:saturation=1.07:gamma=1.02,colorbalance=rs=-0.035:gs=-0.005:bs=0.045:rm=0.012:bm=-0.012:rh=0.04:gh=0.015:bh=-0.04:pl=1,curves=master='0/0.03 0.25/0.235 0.5/0.52 0.8/0.83 1/0.975',vignette=angle=PI/5.2"
+GRADE="format=gbrp,split[ga][gb];[gb]curves=master='0/0 0.62/0 1/1',gblur=sigma=30[gbl];[ga][gbl]blend=all_mode=screen:all_opacity=0.2,format=yuv420p,eq=contrast=1.04:saturation=1.07:gamma=1.02,colorbalance=rs=-0.035:gs=-0.005:bs=0.045:rm=0.012:bm=-0.012:rh=0.04:gh=0.015:bh=-0.04,curves=master='0/0.03 0.25/0.235 0.5/0.52 0.8/0.83 1/0.975',vignette=angle=PI/5.2"
 
 SS=""; DUR=""; OUT="admas_promo_${L}.mp4"; CRF=17; PRE=slow
 if [ -n "$2" ]; then SS="-ss $2"; DUR="-t $3"; OUT="prev_${L}.mp4"; CRF=22; PRE=veryfast; fi
@@ -37,7 +37,7 @@ ffmpeg -hide_banner -loglevel error -stats -y -i src.mov -i introbg.mp4 -i endbg
 [1:v]fps=25,format=yuv420p,fade=t=out:st=$(python3 -c "print($OFF-0.45)"):d=0.45[intro];
 [intro][body]concat=n=2:v=1:a=0,settb=1/25,
  ass=gfx_${L}.ass:fontsdir=sf,
- noise=alls=4:allf=t,
+ noise=alls=3:allf=t,
  fade=t=in:st=0:d=0.5,fade=t=out:st=$(python3 -c "print($TOT-0.8)"):d=0.8,format=yuv420p[v]" \
  -map "[v]" -map 3:a $SS $DUR -c:v libx264 -preset $PRE -crf $CRF -profile:v high -pix_fmt yuv420p \
  -color_primaries bt709 -color_trc bt709 -colorspace bt709 -movflags +faststart \
