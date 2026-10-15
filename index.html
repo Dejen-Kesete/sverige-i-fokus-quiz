@@ -228,6 +228,21 @@
   .sample-cta h3{font-size:26px;margin:0 0 8px;}
   .sample-cta p{margin:0 0 16px;color:var(--fg-soft);font-size:14.5px;line-height:1.55;}
   @media (max-width:900px){.reviews-grid{grid-template-columns:1fr;}}
+  .progress-panel{background:var(--card-bg);border:1px solid var(--card-border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:10px 18px;align-items:center;}
+  .progress-panel .pp-title{font-family:var(--head);font-size:24px;text-transform:uppercase;line-height:1.1;}
+  .progress-panel .pp-sub{font-size:14px;color:var(--fg-soft);margin-top:4px;}
+  .progress-panel .pp-bar{grid-column:1 / -1;height:8px;background:var(--opt-bg);border-radius:6px;overflow:hidden;}
+  .progress-panel .pp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--brand));transition:width .6s;}
+  .progress-panel .pp-dots{grid-column:1 / -1;display:flex;gap:5px;flex-wrap:wrap;}
+  .progress-panel .pp-dot{width:22px;height:22px;border-radius:4px;background:var(--opt-bg);border:1px solid var(--card-border);font-size:10.5px;display:flex;align-items:center;justify-content:center;color:var(--fg-soft);}
+  .progress-panel .pp-dot.ok{background:var(--green);border-color:var(--green);color:#fff;}
+  .progress-panel .pp-dot.tried{border-color:var(--brand);color:var(--brand);}
+  .welcome-back{background:rgba(248,172,0,.08);border:1px solid rgba(248,172,0,.35);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;font-size:14.5px;}
+  .celebrate{margin:18px auto 4px;padding:22px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(240,106,40,.18),rgba(248,172,0,.14));border:1px solid rgba(248,172,0,.5);}
+  .celebrate h3{font-size:30px;margin:0 0 6px;}
+  .celebrate p{margin:0;font-size:15px;color:var(--fg);}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:50;}
+  @media (max-width:600px){.progress-panel{grid-template-columns:1fr;}}
   .hidden{display:none !important;}
   #diplomaCanvas{display:none;}
 
@@ -354,6 +369,16 @@
   <div id="screen-loading" class="hidden"><div class="auth-loading">Laddar...</div></div>
 
   <div id="screen-select" class="hidden">
+    <div class="welcome-back hidden" id="welcomeBack"></div>
+    <div class="progress-panel hidden" id="progressPanel">
+      <div>
+        <div class="pp-title" id="ppTitle"></div>
+        <div class="pp-sub" id="ppSub"></div>
+      </div>
+      <button class="start-btn" id="ppNextBtn" style="margin-left:0;"></button>
+      <div class="pp-bar"><div class="pp-fill" id="ppFill" style="width:0%"></div></div>
+      <div class="pp-dots" id="ppDots"></div>
+    </div>
     <div class="toolbar">
       <div class="toggle-chip active" id="chipShuffleQ">🔀 Slumpa frågor</div>
       <div class="toggle-chip active" id="chipShuffleO">🔀 Slumpa svar</div>
@@ -507,6 +532,7 @@
   </div>
 </footer>
 <canvas id="diplomaCanvas" width="1000" height="700"></canvas>
+<canvas id="confetti" class="hidden"></canvas>
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -534,6 +560,9 @@ let shuffleQ = true;
 let shuffleO = true;
 let isSignupMode = false;
 let sampleMode = false;
+let lastActivity = null;
+let welcomeShown = false;
+const PASS = 80;
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------------- Elements ---------------- */
@@ -814,10 +843,13 @@ async function getMyProgress(){
   if(!currentUser) return {};
   const { data } = await supabase
     .from('attempts')
-    .select('chapter_id, percent')
+    .select('chapter_id, percent, created_at')
     .eq('user_id', currentUser.id);
   const best = {};
+  lastActivity = null;
   (data || []).forEach(a => {
+    const t = new Date(a.created_at);
+    if(!lastActivity || t > lastActivity) lastActivity = t;
     if(a.chapter_id == null) return;
     if(!(a.chapter_id in best) || a.percent > best[a.chapter_id]) best[a.chapter_id] = a.percent;
   });
@@ -871,6 +903,8 @@ async function renderChapterGrid(){
     document.getElementById('startAllBtn').classList.add('hidden');
     document.getElementById('quickReviewBtn').classList.add('hidden');
     document.getElementById('moreLabel').classList.add('hidden');
+    document.getElementById('progressPanel').classList.add('hidden');
+    document.getElementById('welcomeBack').classList.add('hidden');
     document.getElementById('stripeCheckoutBtn').addEventListener('click', startStripeCheckout);
     const reqBtn = document.getElementById('requestAccessBtn');
     if(reqBtn) reqBtn.addEventListener('click', submitAccessRequest);
@@ -879,6 +913,7 @@ async function renderChapterGrid(){
   document.getElementById('startAllBtn').classList.remove('hidden');
   document.getElementById('quickReviewBtn').classList.remove('hidden');
   document.getElementById('moreLabel').classList.remove('hidden');
+  renderProgressPanel(visibleChapters, progress);
   visibleChapters.forEach((ch) => {
     const qCount = allQuestions.filter(q => q.chapter_id === ch.id).length;
     const pct = progress[ch.id];
@@ -1103,6 +1138,7 @@ async function loadLeaderboard(){
 
 async function showResults(){
   const pct = Math.round((score/currentQuestions.length)*100);
+  document.querySelectorAll('.celebrate').forEach(e => e.remove());
   document.getElementById('sampleCta').classList.toggle('hidden', !sampleMode);
   document.getElementById('reviewForm').classList.add('hidden');
   if(sampleMode){
@@ -1124,6 +1160,8 @@ async function showResults(){
     } else missedList.classList.add('hidden');
     return;
   }
+  const before = currentChapterId !== null ? await getMyProgress() : {};
+  const firstPass = currentChapterId !== null && pct >= PASS && !((before[currentChapterId] ?? -1) >= PASS);
   await saveAttempt(pct);
   showScreen('results');
 
@@ -1139,6 +1177,21 @@ async function showResults(){
 
   const diplomaArea = document.getElementById('diplomaArea');
   diplomaArea.innerHTML = '';
+  if(firstPass){
+    const after = await getMyProgress();
+    const accessible = chapters.filter(ch => allQuestions.some(q => q.chapter_id === ch.id));
+    const passedNow = accessible.filter(ch => (after[ch.id] ?? -1) >= PASS).length;
+    const n = chapters.findIndex(c => c.id === currentChapterId) + 1;
+    const allDone = passedNow === accessible.length;
+    const cel = document.createElement('div');
+    cel.className = 'celebrate';
+    cel.innerHTML = allDone
+      ? `<h3>🏆 Grattis – alla kapitel klara!</h3><p>Du har klarat alla ${accessible.length} kapitel. Du är väl förberedd inför medborgarskapsprovet – lycka till!</p>`
+      : `<h3>🎉 Grattis! Kapitel ${n} är klart</h3><p>Du har nu klarat <b>${passedNow} av ${accessible.length}</b> kapitel. Bara ${accessible.length - passedNow} kvar – fortsätt så!</p>`;
+    diplomaArea.before(cel);
+
+    launchConfetti();
+  }
   if(pct >= 80){
     const dataUrl = await drawDiploma(currentChapterLabel, pct);
     diplomaArea.innerHTML = `<div class="diploma-badge">🏅 Du klarade ${pct}%!</div>`;
@@ -1176,6 +1229,80 @@ document.getElementById('toChaptersBtn').addEventListener('click', () => {
   if(sampleMode){ sampleMode = false; showScreen('auth'); return; }
   showScreen('select');
 });
+
+/* ---------------- Motivation: framsteg, välkommen tillbaka, grattis ---------------- */
+function renderProgressPanel(visibleChapters, progress){
+  const panel = document.getElementById('progressPanel');
+  const total = visibleChapters.length;
+  if(!total){ panel.classList.add('hidden'); return; }
+  const passed = visibleChapters.filter(ch => (progress[ch.id] ?? -1) >= PASS).length;
+  const next = visibleChapters.find(ch => (progress[ch.id] ?? -1) < PASS);
+  const name = currentProfile && currentProfile.display_name && !currentProfile.display_name.includes('@')
+    ? currentProfile.display_name.split(' ')[0] : '';
+  document.getElementById('ppTitle').textContent = passed === total
+    ? `🏆 Alla ${total} kapitel klara${name ? ', ' + name : ''}!`
+    : `Du har klarat ${passed} av ${total} kapitel`;
+  document.getElementById('ppSub').textContent = passed === total
+    ? 'Fantastiskt! Kör "Alla kapitel i följd" eller Snabbläst för att hålla kunskapen fräsch inför provet.'
+    : passed === 0
+      ? `Ett kapitel räknas som klart när du får minst ${PASS} %. Börja med kapitel ett – du klarar det!`
+      : `Bra jobbat${name ? ', ' + name : ''}! Ett kapitel räknas som klart vid minst ${PASS} %. Fortsätt så!`;
+  document.getElementById('ppFill').style.width = `${Math.round(passed / total * 100)}%`;
+  document.getElementById('ppDots').innerHTML = visibleChapters.map(ch => {
+    const p = progress[ch.id];
+    const n = chapters.findIndex(c => c.id === ch.id) + 1;
+    const cls = p === undefined ? '' : (p >= PASS ? 'ok' : 'tried');
+    return `<span class="pp-dot ${cls}" title="${esc(ch.title)}${p !== undefined ? ' – bästa ' + p + ' %' : ''}">${p >= PASS ? '✓' : n}</span>`;
+  }).join('');
+  const btn = document.getElementById('ppNextBtn');
+  if(next){
+    const n = chapters.findIndex(c => c.id === next.id) + 1;
+    btn.textContent = `Nästa: kapitel ${n} →`;
+    btn.onclick = () => startQuiz(next.id, next.title);
+    btn.classList.remove('hidden');
+  } else {
+    btn.textContent = 'Kör alla kapitel →';
+    btn.onclick = () => startQuiz('all', 'Alla kapitel');
+  }
+  panel.classList.remove('hidden');
+
+  const wb = document.getElementById('welcomeBack');
+  if(!welcomeShown && lastActivity){
+    const days = Math.floor((Date.now() - lastActivity.getTime()) / 86400000);
+    if(days >= 3){
+      wb.innerHTML = `👋 <b>Välkommen tillbaka${name ? ', ' + esc(name) : ''}!</b> Det var ${days} dagar sedan du övade senast. Några frågor om dagen gör stor skillnad – ${next ? 'fortsätt där du slutade.' : 'repetera gärna med Snabbläst.'}`;
+      wb.classList.remove('hidden');
+    }
+    welcomeShown = true;
+  } else if(welcomeShown && wb.dataset.seen){ wb.classList.add('hidden'); }
+  wb.dataset.seen = '1';
+}
+
+function launchConfetti(){
+  const c = document.getElementById('confetti');
+  c.classList.remove('hidden');
+  const ctx = c.getContext('2d');
+  c.width = innerWidth; c.height = innerHeight;
+  const colors = ['#f8ac00','#f06a28','#f7f4ed','#5fbf86','#4a90d9'];
+  const parts = Array.from({length: 160}, () => ({
+    x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5,
+    w: 6 + Math.random() * 6, h: 8 + Math.random() * 8,
+    vx: -2 + Math.random() * 4, vy: 2 + Math.random() * 4,
+    r: Math.random() * Math.PI, vr: -.2 + Math.random() * .4,
+    col: colors[Math.floor(Math.random() * colors.length)]
+  }));
+  const start = performance.now();
+  (function frame(t){
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += .05; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+    });
+    if(t - start < 3500) requestAnimationFrame(frame);
+    else { ctx.clearRect(0, 0, c.width, c.height); c.classList.add('hidden'); }
+  })(start);
+}
 
 /* ---------------- Gratis provtest ---------------- */
 document.getElementById('freeTestBtn').addEventListener('click', async () => {
