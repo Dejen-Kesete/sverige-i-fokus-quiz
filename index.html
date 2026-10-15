@@ -219,8 +219,11 @@
     .chapter-card{grid-template-columns:auto 1fr;}
     .chapter-card .badge{grid-column:2;justify-self:start;}
     .start-btn{margin-left:0;flex-basis:100%;}
-    .mat-btn{flex:1 1 auto;justify-content:center;}
-    .userbar .uname{display:none;}
+    .mat-btn{flex:1 1 0;justify-content:center;padding:10px 4px;font-size:12.5px;gap:5px;}
+    .userbar .uname,.tt-label{display:none;}
+    .brand-name b{font-size:17px;white-space:nowrap;}
+    .brand-link img{height:36px;width:36px;}
+    .topbar-inner{padding:8px 14px;gap:8px;}
   }
 </style>
 
@@ -253,7 +256,7 @@
     <section class="hero">
       <div>
         <div class="kicker">Medborgarskapsprov · Övning</div>
-        <h1>Klara provet med <em>Sverige i fokus</em></h1>
+        <h1>Förbered dig med <em>Sverige i fokus</em></h1>
         <p class="lead">Allt du behöver för att förbereda dig inför medborgarskapsprovet – på svenska och på ditt modersmål.</p>
         <ul class="hero-points">
           <li><span><b>Över 300 övningsfrågor</b> med rätt svar och tydliga förklaringar</span></li>
@@ -290,8 +293,8 @@
     <h2 class="section-title">Det här ingår</h2>
     <section class="features">
       <div class="feature"><div class="ic">📝</div><h3>300+ frågor</h3><p>Övningsfrågor baserade på den officiella boken, med förklaring till varje svar.</p></div>
-      <div class="feature"><div class="ic">📖</div><h3>Tigrinja</h3><p>Hela boken översatt till tigrinja – kapitel för kapitel.</p></div>
-      <div class="feature"><div class="ic">🇸🇪</div><h3>Lätt svenska</h3><p>Hela boken på lätt svenska – enklare att läsa och förstå.</p></div>
+      <div class="feature"><div class="ic">📙</div><h3>Tigrinja</h3><p>Hela boken översatt till tigrinja – kapitel för kapitel.</p></div>
+      <div class="feature"><div class="ic">📗</div><h3>Lätt svenska</h3><p>Hela boken på lätt svenska – enklare att läsa och förstå.</p></div>
       <div class="feature"><div class="ic">🔑</div><h3>Viktiga ord</h3><p>De viktigaste orden i varje kapitel, översatta och förklarade.</p></div>
     </section>
 
@@ -494,7 +497,7 @@ function showScreen(name){
 const themeToggle = document.getElementById('themeToggle');
 function applyTheme(mode){
   document.body.classList.toggle('light', mode === 'light');
-  themeToggle.textContent = mode === 'light' ? '🌙 Mörkt läge' : '☀️ Ljust läge';
+  themeToggle.innerHTML = mode === 'light' ? '🌙<span class="tt-label"> Mörkt läge</span>' : '☀️<span class="tt-label"> Ljust läge</span>';
   localStorage.setItem('sif_theme', mode);
 }
 applyTheme(localStorage.getItem('sif_theme') || 'dark');
