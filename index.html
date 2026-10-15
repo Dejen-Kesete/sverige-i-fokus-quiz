@@ -204,6 +204,30 @@
   .site-footer .links{display:flex;gap:18px;flex-wrap:wrap;}
   .site-footer .credit{flex-basis:100%;font-size:11.5px;opacity:.75;}
 
+  .free-cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px;}
+  .free-btn{background:transparent;color:var(--fg);border:2px solid var(--brand);font-family:inherit;font-weight:700;font-size:15px;padding:13px 20px;border-radius:var(--radius);cursor:pointer;}
+  .free-btn:hover{background:rgba(248,172,0,.12);}
+  .free-cta small{color:var(--fg-soft);font-size:13px;}
+  .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+  .review-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px;}
+  .review-card .stars,.stars{color:var(--brand);letter-spacing:2px;font-size:16px;}
+  .review-card p{margin:10px 0 12px;font-size:14px;line-height:1.6;}
+  .review-card small{color:var(--fg-soft);font-size:12.5px;}
+  .comment-toggle{background:none;border:none;color:var(--fg-soft);font-family:inherit;font-size:13px;cursor:pointer;padding:0;margin-top:14px;text-decoration:underline;}
+  .comment-toggle:hover{color:var(--brand);}
+  .comment-box{margin-top:10px;}
+  .comment-box textarea,.review-form textarea{width:100%;min-height:76px;padding:11px 12px;border-radius:var(--radius);border:1px solid var(--card-border);background:var(--opt-bg);color:var(--fg);font-family:inherit;font-size:14px;resize:vertical;}
+  .comment-box .row{display:flex;gap:10px;align-items:center;margin-top:8px;}
+  .form-msg{font-size:13px;color:var(--fg-soft);}
+  .review-form{margin-top:26px;padding:20px;border:1px solid var(--card-border);border-radius:var(--radius);text-align:left;background:var(--opt-bg);}
+  .review-form h4{margin:0 0 6px;font-size:15px;}
+  .star-pick{display:flex;gap:4px;margin:8px 0 10px;}
+  .star-pick button{background:none;border:none;font-size:28px;line-height:1;color:var(--card-border);cursor:pointer;padding:0 2px;}
+  .star-pick button.on{color:var(--brand);}
+  .sample-cta{margin-top:22px;padding:22px;border:2px solid var(--brand);border-radius:var(--radius);background:rgba(248,172,0,.07);}
+  .sample-cta h3{font-size:26px;margin:0 0 8px;}
+  .sample-cta p{margin:0 0 16px;color:var(--fg-soft);font-size:14.5px;line-height:1.55;}
+  @media (max-width:900px){.reviews-grid{grid-template-columns:1fr;}}
   .hidden{display:none !important;}
   #diplomaCanvas{display:none;}
 
@@ -268,6 +292,10 @@
           <li><span><b>Viktiga ord</b> från varje kapitel med förklaringar</span></li>
         </ul>
         <div class="price-line"><b>299 kr</b> engångsbetalning · obegränsad tillgång till alla 13 kapitel</div>
+        <div class="free-cta">
+          <button class="free-btn" id="freeTestBtn">▶ Testa gratis – 13 frågor</button>
+          <small>En fråga från varje kapitel. Inget konto behövs.</small>
+        </div>
       </div>
 
       <div id="authCol">
@@ -301,9 +329,14 @@
       <div class="feature"><div class="ic">🔑</div><h3>Viktiga ord</h3><p>De viktigaste orden i varje kapitel, översatta och förklarade.</p></div>
     </section>
 
+    <div id="reviewsSection" class="hidden">
+      <h2 class="section-title">Vad användarna säger</h2>
+      <section class="reviews-grid" id="reviewsGrid"></section>
+    </div>
+
     <h2 class="section-title">Så fungerar det</h2>
     <section class="how">
-      <div><b>1</b>Skapa ett gratis konto med din e-post.</div>
+      <div><b>1</b>Testa gratis med 13 frågor – sedan skapar du ett konto med din e-post.</div>
       <div><b>2</b>Betala 299 kr med kort, Apple Pay, Google Pay eller Swish.</div>
       <div><b>3</b>Läs, öva och få ett diplom när du klarar 80 %.</div>
     </section>
@@ -357,7 +390,12 @@
       <div class="toggle-chip" id="tabRequests">📥 Förfrågningar</div>
       <div class="toggle-chip" id="tabQuestions">📝 Frågor</div>
       <div class="toggle-chip" id="tabStats">📊 Statistik</div>
+      <div class="toggle-chip" id="tabComments">💬 Kommentarer</div>
+      <div class="toggle-chip" id="tabReviews">⭐ Omdömen</div>
     </div>
+
+    <div id="adminTabComments" class="hidden"><div id="commentsAdminList"></div></div>
+    <div id="adminTabReviews" class="hidden"><div id="reviewsAdminList"></div></div>
 
     <!-- FÖRFRÅGNINGAR TAB -->
     <div id="adminTabRequests" class="hidden">
@@ -417,6 +455,13 @@
       <p class="q-text" id="qText"></p>
       <div class="options" id="optionsWrap"></div>
       <div class="explanation hidden" id="explanationBox"></div>
+      <div id="commentArea" class="hidden">
+        <button class="comment-toggle" id="commentToggle">💬 Kommentera frågan – oklart eller fel? Säg till!</button>
+        <div class="comment-box hidden" id="commentBox">
+          <textarea id="commentInput" maxlength="1000" placeholder="Skriv din kommentar. Bara Admas Studio ser den."></textarea>
+          <div class="row"><button class="btn-primary" id="commentSendBtn">Skicka kommentar</button><span class="form-msg" id="commentMsg"></span></div>
+        </div>
+      </div>
       <button class="nextbtn" id="nextBtn">Nästa fråga →</button>
     </div>
   </div>
@@ -432,8 +477,20 @@
         <button class="btn-primary" id="retryBtn">Gör om quizet</button>
         <button class="btn-secondary" id="toChaptersBtn">Välj annat kapitel</button>
       </div>
+      <div class="sample-cta hidden" id="sampleCta">
+        <h3>Gillade du provet?</h3>
+        <p>Lås upp alla 300+ frågor, hela boken på tigrinja och lätt svenska, viktiga ord och diplom – för 299 kr.</p>
+        <button class="btn-primary" id="sampleSignupBtn" style="padding:14px 22px;font-size:15px;">Skapa konto och lås upp allt →</button>
+      </div>
       <div class="missed-list hidden" id="missedList"></div>
       <div class="lb-list hidden" id="leaderboardList"></div>
+      <div class="review-form hidden" id="reviewForm">
+        <h4>Vad tycker du om Sverige i fokus?</h4>
+        <div class="form-msg">Ditt omdöme kan visas på startsidan med ditt förnamn efter granskning.</div>
+        <div class="star-pick" id="starPick"></div>
+        <textarea id="reviewInput" maxlength="600" placeholder="Berätta kort vad du tycker…"></textarea>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:8px;"><button class="btn-primary" id="reviewSendBtn">Skicka omdöme</button><span class="form-msg" id="reviewMsg"></span></div>
+      </div>
     </div>
   </div>
 
@@ -476,6 +533,8 @@ let currentChapterId = null; // null = "all chapters"
 let shuffleQ = true;
 let shuffleO = true;
 let isSignupMode = false;
+let sampleMode = false;
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------------- Elements ---------------- */
 const screens = {
@@ -877,6 +936,7 @@ function prepareQuestions(list){
 
 /* ---------------- Quiz flow ---------------- */
 function startQuiz(chapterId, chapterTitle){
+  sampleMode = false;
   if(chapterId === 'all'){
     baseQuestions = allQuestions.map(q => ({...q, chapter_title: chapters.find(c=>c.id===q.chapter_id)?.title || ''}));
     currentChapterLabel = 'Alla kapitel';
@@ -908,6 +968,7 @@ document.getElementById('quickReviewBtn').addEventListener('click', async () => 
     return;
   }
   baseQuestions = available.map(q => ({...q, chapter_title: chapters.find(c=>c.id===q.chapter_id)?.title || ''}));
+  sampleMode = false;
   currentChapterLabel = `Snabbläst (${available.length} frågor)`;
   currentChapterId = null;
   currentQuestions = prepareQuestions(baseQuestions);
@@ -925,6 +986,10 @@ function renderQuestion(){
   document.getElementById('progressFill').style.width = `${(currentIdx/currentQuestions.length)*100}%`;
   document.getElementById('explanationBox').classList.add('hidden');
   document.getElementById('nextBtn').classList.remove('show');
+  document.getElementById('commentArea').classList.add('hidden');
+  document.getElementById('commentBox').classList.add('hidden');
+  document.getElementById('commentInput').value = '';
+  document.getElementById('commentMsg').textContent = '';
   const wrap = document.getElementById('optionsWrap');
   wrap.innerHTML = '';
   q.options.forEach((opt, idx) => {
@@ -952,6 +1017,7 @@ function selectAnswer(idx){
   const box = document.getElementById('explanationBox');
   box.innerHTML = `<b>${wasCorrect ? 'Rätt! ' : 'Rätt svar: ' + q.options[q.correct_index] + '. '}</b>${q.explanation}`;
   box.classList.remove('hidden');
+  if(currentUser && !sampleMode) document.getElementById('commentArea').classList.remove('hidden');
   document.getElementById('nextBtn').classList.add('show');
 }
 
@@ -961,7 +1027,10 @@ document.getElementById('nextBtn').addEventListener('click', () => {
   else renderQuestion();
 });
 
-document.getElementById('backBtn').addEventListener('click', () => showScreen('select'));
+document.getElementById('backBtn').addEventListener('click', () => {
+  if(sampleMode){ sampleMode = false; showScreen('auth'); return; }
+  showScreen('select');
+});
 
 /* ---------------- Results + save to Supabase ---------------- */
 let _diplomaLogo = null;
@@ -1032,6 +1101,27 @@ async function loadLeaderboard(){
 
 async function showResults(){
   const pct = Math.round((score/currentQuestions.length)*100);
+  document.getElementById('sampleCta').classList.toggle('hidden', !sampleMode);
+  document.getElementById('reviewForm').classList.add('hidden');
+  if(sampleMode){
+    showScreen('results');
+    document.getElementById('resultsChapterName').textContent = 'GRATIS PROVTEST';
+    document.getElementById('scoreText').textContent = `${score}/${currentQuestions.length}`;
+    document.getElementById('scorePercent').textContent = `${pct}% rätt`;
+    document.getElementById('resultsMsg').textContent = pct >= 80
+      ? 'Starkt! Du är på god väg – öva på alla kapitel för att vara säker inför provet.'
+      : 'Bra start! Med alla 300+ frågor och boken på ditt språk blir du redo inför provet.';
+    document.getElementById('diplomaArea').innerHTML = '';
+    document.getElementById('leaderboardList').classList.add('hidden');
+    const missedList = document.getElementById('missedList');
+    if(missed.length > 0){
+      missedList.classList.remove('hidden');
+      missedList.innerHTML = '<h4>Frågor att repetera</h4>' + missed.map(m => `
+        <div class="missed-item"><b>${esc(m.q)}</b>Rätt svar: <span class="correct-answer">${esc(m.correct)}</span></div>
+      `).join('');
+    } else missedList.classList.add('hidden');
+    return;
+  }
   await saveAttempt(pct);
   showScreen('results');
 
@@ -1070,6 +1160,7 @@ async function showResults(){
   } else missedList.classList.add('hidden');
 
   await loadLeaderboard();
+  await maybeShowReviewForm();
   await renderChapterGrid();
 }
 
@@ -1079,7 +1170,101 @@ document.getElementById('retryBtn').addEventListener('click', () => {
   showScreen('quiz');
   renderQuestion();
 });
-document.getElementById('toChaptersBtn').addEventListener('click', () => showScreen('select'));
+document.getElementById('toChaptersBtn').addEventListener('click', () => {
+  if(sampleMode){ sampleMode = false; showScreen('auth'); return; }
+  showScreen('select');
+});
+
+/* ---------------- Gratis provtest ---------------- */
+document.getElementById('freeTestBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('freeTestBtn');
+  btn.disabled = true; btn.textContent = 'Laddar…';
+  const { data, error } = await supabase.rpc('get_sample_questions');
+  btn.disabled = false; btn.textContent = '▶ Testa gratis – 13 frågor';
+  if(error || !data || !data.length){ alert('Kunde inte ladda provtestet just nu. Försök igen om en stund.'); return; }
+  sampleMode = true;
+  baseQuestions = data.map(q => ({...q, chapter_title: `Kapitel ${q.chapter_order} · ${q.chapter_title}`}));
+  currentChapterLabel = 'Gratis provtest';
+  currentChapterId = null;
+  const keepShuffleQ = shuffleQ; shuffleQ = false;
+  currentQuestions = prepareQuestions(baseQuestions);
+  shuffleQ = keepShuffleQ;
+  currentIdx = 0; score = 0; missed = [];
+  showScreen('quiz');
+  renderQuestion();
+});
+document.getElementById('sampleSignupBtn').addEventListener('click', () => {
+  sampleMode = false;
+  showScreen('auth');
+  setAuthMode(true);
+  setTimeout(() => document.getElementById('authCol').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+});
+
+/* ---------------- Omdömen på startsidan ---------------- */
+async function loadPublicReviews(){
+  const { data } = await supabase.from('reviews').select('display_name, rating, review_text, created_at')
+    .eq('approved', true).order('created_at', { ascending: false }).limit(6);
+  const section = document.getElementById('reviewsSection');
+  if(!data || !data.length){ section.classList.add('hidden'); return; }
+  document.getElementById('reviewsGrid').innerHTML = data.map(r => `
+    <div class="review-card">
+      <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+      <p>”${esc(r.review_text)}”</p>
+      <small>– ${esc(r.display_name)}</small>
+    </div>`).join('');
+  section.classList.remove('hidden');
+}
+loadPublicReviews();
+
+/* ---------------- Kommentera fråga ---------------- */
+document.getElementById('commentToggle').addEventListener('click', () => {
+  document.getElementById('commentBox').classList.toggle('hidden');
+  document.getElementById('commentInput').focus();
+});
+document.getElementById('commentSendBtn').addEventListener('click', async () => {
+  const input = document.getElementById('commentInput');
+  const msg = document.getElementById('commentMsg');
+  const text = input.value.trim();
+  if(!text){ msg.textContent = 'Skriv något först.'; return; }
+  const q = currentQuestions[currentIdx];
+  const btn = document.getElementById('commentSendBtn');
+  btn.disabled = true;
+  const { error } = await supabase.from('question_comments').insert({ question_id: q.id, comment: text });
+  btn.disabled = false;
+  if(error){ msg.textContent = 'Kunde inte skicka: ' + error.message; return; }
+  input.value = '';
+  document.getElementById('commentBox').classList.add('hidden');
+  document.getElementById('commentToggle').textContent = '✅ Tack! Din kommentar är skickad.';
+});
+
+/* ---------------- Lämna omdöme ---------------- */
+let reviewRating = 5;
+function renderStarPick(){
+  document.getElementById('starPick').innerHTML = [1,2,3,4,5].map(n =>
+    `<button type="button" data-n="${n}" class="${n <= reviewRating ? 'on' : ''}" aria-label="${n} stjärnor">★</button>`).join('');
+  document.querySelectorAll('#starPick button').forEach(b => b.addEventListener('click', () => {
+    reviewRating = parseInt(b.dataset.n); renderStarPick();
+  }));
+}
+async function maybeShowReviewForm(){
+  const form = document.getElementById('reviewForm');
+  if(!currentUser){ form.classList.add('hidden'); return; }
+  const { data } = await supabase.from('reviews').select('id').eq('user_id', currentUser.id).limit(1);
+  if(data && data.length){ form.classList.add('hidden'); return; }
+  reviewRating = 5; renderStarPick();
+  document.getElementById('reviewMsg').textContent = '';
+  form.classList.remove('hidden');
+}
+document.getElementById('reviewSendBtn').addEventListener('click', async () => {
+  const text = document.getElementById('reviewInput').value.trim();
+  const msg = document.getElementById('reviewMsg');
+  if(text.length < 5){ msg.textContent = 'Skriv minst några ord.'; return; }
+  const fullName = (currentProfile && currentProfile.display_name) || (currentUser.email || '').split('@')[0];
+  const firstName = (fullName || 'Elev').trim().split(/\s+/)[0].slice(0, 60);
+  const { error } = await supabase.from('reviews').insert({ display_name: firstName, rating: reviewRating, review_text: text });
+  if(error){ msg.textContent = 'Kunde inte skicka: ' + error.message; return; }
+  document.getElementById('reviewForm').innerHTML = '<h4>Tack för ditt omdöme! 🙏</h4><div class="form-msg">Det visas på startsidan när det har granskats.</div>';
+});
 
 /* ---------------- Book viewer (Läs boken) ---------------- */
 let currentBookChapterOrder = null;
@@ -1141,6 +1326,12 @@ function switchAdminTab(tab){
   document.getElementById('adminTabRequests').classList.toggle('hidden', tab !== 'requests');
   document.getElementById('adminTabQuestions').classList.toggle('hidden', tab !== 'questions');
   document.getElementById('adminTabStats').classList.toggle('hidden', tab !== 'stats');
+  document.getElementById('adminTabComments').classList.toggle('hidden', tab !== 'comments');
+  document.getElementById('adminTabReviews').classList.toggle('hidden', tab !== 'reviews');
+  document.getElementById('tabComments').classList.toggle('active', tab === 'comments');
+  document.getElementById('tabReviews').classList.toggle('active', tab === 'reviews');
+  if(tab === 'comments') loadCommentsAdmin();
+  if(tab === 'reviews') loadReviewsAdmin();
   document.getElementById('tabStudents').classList.toggle('active', tab === 'students');
   document.getElementById('tabRequests').classList.toggle('active', tab === 'requests');
   document.getElementById('tabQuestions').classList.toggle('active', tab === 'questions');
@@ -1153,6 +1344,57 @@ document.getElementById('tabStudents').addEventListener('click', () => switchAdm
 document.getElementById('tabRequests').addEventListener('click', () => switchAdminTab('requests'));
 document.getElementById('tabQuestions').addEventListener('click', () => switchAdminTab('questions'));
 document.getElementById('tabStats').addEventListener('click', () => switchAdminTab('stats'));
+document.getElementById('tabComments').addEventListener('click', () => switchAdminTab('comments'));
+document.getElementById('tabReviews').addEventListener('click', () => switchAdminTab('reviews'));
+
+async function loadCommentsAdmin(){
+  const list = document.getElementById('commentsAdminList');
+  list.innerHTML = '<p style="color:var(--fg-soft);">Laddar...</p>';
+  const { data, error } = await supabase.rpc('admin_list_question_comments');
+  if(error){ list.innerHTML = `<p style="color:var(--fg-soft);">Kunde inte hämta kommentarer: ${esc(error.message)}</p>`; return; }
+  if(!data || !data.length){ list.innerHTML = '<p style="color:var(--fg-soft);">Inga kommentarer än.</p>'; return; }
+  list.innerHTML = data.map(c => `
+    <div class="admin-row" style="flex-direction:column;gap:6px;${c.status==='handled'?'opacity:.55;':''}">
+      <div><b>”${esc(c.comment)}”</b>
+        <span>${esc(c.display_name || '')} (${esc(c.email || '')}) · ${new Date(c.created_at).toLocaleString('sv-SE')}</span></div>
+      <div style="font-size:12.5px;">Fråga (${esc(c.chapter_title)}): ${esc(c.question_text)}</div>
+      ${c.status==='new' ? `<div><button class="btn-secondary" style="padding:6px 12px;font-size:12px;" data-handle="${c.id}">✔ Markera som hanterad</button></div>` : '<div style="font-size:12px;">✔ Hanterad</div>'}
+    </div>`).join('');
+  list.querySelectorAll('[data-handle]').forEach(b => b.addEventListener('click', async () => {
+    const { error } = await supabase.from('question_comments').update({ status: 'handled' }).eq('id', b.dataset.handle);
+    if(error){ alert(error.message); return; }
+    loadCommentsAdmin();
+  }));
+}
+
+async function loadReviewsAdmin(){
+  const list = document.getElementById('reviewsAdminList');
+  list.innerHTML = '<p style="color:var(--fg-soft);">Laddar...</p>';
+  const { data, error } = await supabase.from('reviews').select('*').order('approved').order('created_at', { ascending: false });
+  if(error){ list.innerHTML = `<p style="color:var(--fg-soft);">Kunde inte hämta omdömen: ${esc(error.message)}</p>`; return; }
+  if(!data || !data.length){ list.innerHTML = '<p style="color:var(--fg-soft);">Inga omdömen än.</p>'; return; }
+  list.innerHTML = data.map(r => `
+    <div class="admin-row" style="flex-direction:column;gap:6px;">
+      <div><span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span> <b style="display:inline;">${esc(r.display_name)}</b>
+        <span>· ${new Date(r.created_at).toLocaleDateString('sv-SE')} · ${r.approved ? '✅ Visas på startsidan' : '⏳ Väntar på godkännande'}</span></div>
+      <div style="color:var(--fg);">”${esc(r.review_text)}”</div>
+      <div style="display:flex;gap:6px;">
+        ${r.approved
+          ? `<button class="btn-secondary" style="padding:6px 12px;font-size:12px;" data-hide="${r.id}">Dölj från startsidan</button>`
+          : `<button class="btn-primary" style="padding:6px 12px;font-size:12px;" data-approve="${r.id}">✅ Godkänn och visa</button>`}
+        <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#e88a80;" data-del="${r.id}">Ta bort</button>
+      </div>
+    </div>`).join('');
+  const act = async (id, patch) => { const { error } = await supabase.from('reviews').update(patch).eq('id', id); if(error) alert(error.message); loadReviewsAdmin(); loadPublicReviews(); };
+  list.querySelectorAll('[data-approve]').forEach(b => b.addEventListener('click', () => act(b.dataset.approve, { approved: true })));
+  list.querySelectorAll('[data-hide]').forEach(b => b.addEventListener('click', () => act(b.dataset.hide, { approved: false })));
+  list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+    if(!confirm('Ta bort omdömet permanent?')) return;
+    const { error } = await supabase.from('reviews').delete().eq('id', b.dataset.del);
+    if(error) alert(error.message);
+    loadReviewsAdmin(); loadPublicReviews();
+  }));
+}
 
 async function loadRequestsList(){
   const list = document.getElementById('requestsList');
