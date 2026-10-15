@@ -986,6 +986,8 @@ function renderQuestion(){
   document.getElementById('progressFill').style.width = `${(currentIdx/currentQuestions.length)*100}%`;
   document.getElementById('explanationBox').classList.add('hidden');
   document.getElementById('nextBtn').classList.remove('show');
+  document.getElementById('backBtn').textContent = sampleMode ? '← Tillbaka till startsidan' : '← Tillbaka till kapitel';
+  document.getElementById('toChaptersBtn').textContent = sampleMode ? 'Tillbaka till startsidan' : 'Välj annat kapitel';
   document.getElementById('commentArea').classList.add('hidden');
   document.getElementById('commentBox').classList.add('hidden');
   document.getElementById('commentInput').value = '';
