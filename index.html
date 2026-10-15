@@ -62,6 +62,8 @@
   .userbar button:hover{border-color:var(--brand);color:var(--brand);}
   .theme-toggle{background:none;border:1px solid var(--card-border);color:var(--fg-soft);border-radius:var(--radius);padding:7px 11px;font-family:var(--body);font-size:12.5px;cursor:pointer;}
   .theme-toggle:hover{border-color:var(--brand);color:var(--brand);}
+  .login-jump{font-size:13px;font-weight:700;color:var(--navy-950);background:var(--brand);padding:8px 14px;border-radius:var(--radius);text-decoration:none;}
+  .login-jump:hover{background:var(--brand-hover);}
   .site-link{font-size:12.5px;color:var(--fg-soft);text-decoration:none;white-space:nowrap;}
   .site-link:hover{color:var(--brand);}
 
@@ -237,6 +239,7 @@
     </a>
     <div class="topbar-actions">
       <a class="site-link" href="https://www.admasstudio.se">admasstudio.se ↗</a>
+      <a class="login-jump" id="loginJump" href="#authCol">Logga in</a>
       <div class="userbar hidden" id="userBar"></div>
       <button class="theme-toggle" id="themeToggle">🌙 Mörkt läge</button>
     </div>
@@ -489,6 +492,7 @@ function showScreen(name){
   Object.values(screens).forEach(s => s.classList.add('hidden'));
   screens[name].classList.remove('hidden');
   document.getElementById('appHeader').classList.toggle('hidden', name !== 'select');
+  document.getElementById('loginJump').classList.toggle('hidden', name !== 'auth');
   document.getElementById('mainWrap').classList.toggle('wide', name === 'auth');
   window.scrollTo(0, 0);
 }
